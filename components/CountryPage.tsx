@@ -1,0 +1,68 @@
+'use client';
+
+import Link from 'next/link';
+import { useTranslation } from 'react-i18next';
+import Header from './Header';
+import Footer from './Footer';
+import TrackCard from './TrackCard';
+import { COUNTRIES, findCountry } from '../constants/config';
+import { useTrending } from '../hooks/useTrending';
+import type { MusicType } from '../types';
+
+interface Props { code: string; type: MusicType }
+
+export default function CountryPage({ code, type }: Props) {
+  const { t } = useTranslation();
+  const country = findCountry(code);
+  const { items, loading, error } = useTrending(type, country?.code ?? 'US', 100);
+
+  const countryLabel = country ? `${country.flag} ${country.name}` : code.toUpperCase();
+  const title = type === 'songs'
+    ? t('country.songs_title', { country: countryLabel })
+    : t('country.albums_title', { country: countryLabel });
+
+  const chip: React.CSSProperties = { padding: '6px 14px', borderRadius: 20, backgroundColor: '#1A1A1A', color: '#AAAAAA', fontSize: 13, fontWeight: 600, whiteSpace: 'nowrap', textDecoration: 'none', display: 'inline-block', border: '1px solid #2A2A2A' };
+
+  return (
+    <div style={{ backgroundColor: '#0F0F0F', minHeight: '100vh' }}>
+      <Header />
+      <div style={{ maxWidth: 1280, margin: '0 auto', padding: '32px 16px 64px' }}>
+        <h1 style={{ color: '#fff', fontSize: 22, fontWeight: 800, marginBottom: 4 }}>{title}</h1>
+        <p style={{ color: '#888', fontSize: 13, marginBottom: 28, lineHeight: 1.6 }}>{t('country.subtitle')}</p>
+
+        {error && <p style={{ color: '#A78BFA', fontSize: 14, marginBottom: 20 }}>{error}</p>}
+
+        {loading ? (
+          <div className="grid-cards">
+            {Array.from({ length: 12 }).map((_, i) => (
+              <div key={i}>
+                <div className="skeleton" style={{ aspectRatio: '1/1', borderRadius: 10, marginBottom: 8 }} />
+                <div className="skeleton" style={{ height: 13, borderRadius: 4, marginBottom: 6, width: '80%' }} />
+                <div className="skeleton" style={{ height: 11, borderRadius: 4, width: '40%' }} />
+              </div>
+            ))}
+          </div>
+        ) : items.length === 0 && !error ? (
+          <div style={{ color: '#555', textAlign: 'center', paddingTop: 80 }}>{t('trending.empty')}</div>
+        ) : (
+          <div className="grid-cards">
+            {items.map(item => <TrackCard key={item.id} item={item} />)}
+          </div>
+        )}
+
+        {/* SEO interlinking between country charts */}
+        <div style={{ marginTop: 48 }}>
+          <h2 style={{ color: '#fff', fontSize: 15, fontWeight: 700, marginBottom: 14 }}>{t('country.other_countries')}</h2>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            {COUNTRIES.filter(c => c.code !== country?.code).map(c => (
+              <Link key={c.code} href={`/${type}/country/${c.code.toLowerCase()}`} style={chip}>
+                {c.flag} {c.name}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </div>
+      <Footer />
+    </div>
+  );
+}
