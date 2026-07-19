@@ -76,6 +76,9 @@ const fr = {
   trending: {
     empty: 'Aucun contenu disponible.',
   },
+  filters: {
+    all: 'Tous',
+  },
   stats: {
     title: 'Statistiques',
     subtitle: 'Vue d\'ensemble des charts analysés par TrendSongs',

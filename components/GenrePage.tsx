@@ -5,14 +5,14 @@ import { useTranslation } from 'react-i18next';
 import Header from './Header';
 import Footer from './Footer';
 import TrackCard from './TrackCard';
-import { MUSIC_GENRES, DEFAULT_COUNTRY } from '../constants/config';
+import { MUSIC_GENRES, DEFAULT_COUNTRY, genreLabel as genreName } from '../constants/config';
 import { useTrending } from '../hooks/useTrending';
 import type { MusicType } from '../types';
 
 interface Props { genre: string; type: MusicType }
 
 export default function GenrePage({ genre, type }: Props) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { items: all, loading, error } = useTrending(type, DEFAULT_COUNTRY, 100);
 
   const genreDef = MUSIC_GENRES.find(g => g.slug === genre);
@@ -22,10 +22,10 @@ export default function GenrePage({ genre, type }: Props) {
     return all.filter(item => item.genreIds.includes(genreDef.id));
   }, [all, genreDef]);
 
-  const genreLabel = genreDef ? `${genreDef.emoji} ${genreDef.label}` : genre;
+  const label = genreDef ? `${genreDef.emoji} ${genreName(genreDef, i18n.language)}` : genre;
   const title = type === 'songs'
-    ? t('genre.songs_title', { genre: genreLabel })
-    : t('genre.albums_title', { genre: genreLabel });
+    ? t('genre.songs_title', { genre: label })
+    : t('genre.albums_title', { genre: label });
 
   return (
     <div style={{ backgroundColor: '#0F0F0F', minHeight: '100vh' }}>

@@ -1,7 +1,8 @@
 'use client';
 import Link from 'next/link';
+import { useTranslation } from 'react-i18next';
 import HScrollWithArrows from './HScrollWithArrows';
-import { COUNTRIES, DEFAULT_COUNTRY } from '../constants/config';
+import { COUNTRIES, DEFAULT_COUNTRY, countryLabel } from '../constants/config';
 import type { MusicType } from '../types';
 
 interface Props {
@@ -11,6 +12,7 @@ interface Props {
 }
 
 export default function CountryFilter({ mediaType, genreSlug, selected }: Props) {
+  const { i18n } = useTranslation();
   function countryHref(code: string) {
     const params = new URLSearchParams();
     if (mediaType === 'albums') params.set('type', 'albums');
@@ -30,13 +32,13 @@ export default function CountryFilter({ mediaType, genreSlug, selected }: Props)
   return (
     <div className="country-filter" style={{ display: 'flex', alignItems: 'center', backgroundColor: '#0F0F0F' }}>
       <div style={{ display: 'flex', alignItems: 'center', paddingLeft: 12, flexShrink: 0 }}>
-        <span style={chipActive}>{selectedCountry.flag} {selectedCountry.name}</span>
+        <span style={chipActive}>{selectedCountry.flag} {countryLabel(selectedCountry, i18n.language)}</span>
         <div style={{ width: 1, height: 24, backgroundColor: '#2A2A2A', marginLeft: 10, flexShrink: 0 }} />
       </div>
       <HScrollWithArrows contentContainerStyle={contentStyle}>
         {others.map(c => (
           <Link key={c.code} href={countryHref(c.code)} style={chip} className="tab-hover">
-            {c.flag} {c.name}
+            {c.flag} {countryLabel(c, i18n.language)}
           </Link>
         ))}
       </HScrollWithArrows>

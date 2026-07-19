@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MUSIC_GENRES, findCountry } from '../constants/config';
+import { MUSIC_GENRES, findCountry, countryLabel as countryName, genreLabel } from '../constants/config';
 import type { TrendingItem, MusicType } from '../types';
 
 interface Props {
@@ -45,7 +45,7 @@ export default function InsightBar({ items, type }: Props) {
       .slice(0, 3)
       .map(([id, { count, name }]) => {
         const def = MUSIC_GENRES.find(g => g.id === id);
-        return { name: def?.label ?? name, pct: Math.round((count / items.length) * 100) };
+        return { name: def ? genreLabel(def, isFr ? 'fr' : 'en') : name, pct: Math.round((count / items.length) * 100) };
       });
 
     // Most present artist
@@ -63,7 +63,7 @@ export default function InsightBar({ items, type }: Props) {
   const hi = (text: string) => <span style={{ color: '#ddd', fontWeight: 500 }}>{text}</span>;
   const num = (text: string) => <span style={{ color: '#A78BFA', fontWeight: 600 }}>{text}</span>;
   const editorial = INSIGHTS[type][isFr ? 'fr' : 'en'];
-  const countryLabel = stats.country ? `${stats.country.flag} ${stats.country.name}` : stats.top.countryCode;
+  const countryLabel = stats.country ? `${stats.country.flag} ${countryName(stats.country, isFr ? 'fr' : 'en')}` : stats.top.countryCode;
 
   const insightText = isFr
     ? <>{hi(`« ${stats.top.name} »`)} de {hi(stats.top.artistName)} est en tête du classement {num(countryLabel)}.{' '}

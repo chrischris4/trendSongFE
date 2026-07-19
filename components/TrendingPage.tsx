@@ -9,13 +9,13 @@ import TrackCard from './TrackCard';
 import { useTrending } from '../hooks/useTrending';
 import { useBlog } from '../hooks/useBlog';
 import { useAppStore } from '../store';
-import { artwork, DEFAULT_COUNTRY, findCountry } from '../constants/config';
+import { artwork, DEFAULT_COUNTRY, findCountry, countryLabel } from '../constants/config';
 import type { MusicType } from '../types';
 
 interface Props { type: MusicType }
 
 function TrendingContent({ type }: Props) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const searchParams = useSearchParams();
   const country = findCountry(searchParams.get('country'))?.code ?? DEFAULT_COUNTRY;
 
@@ -39,7 +39,7 @@ function TrendingContent({ type }: Props) {
       <Header />
       <div style={{ maxWidth: 1280, margin: '0 auto', padding: '32px 16px 64px' }}>
         <h1 style={{ color: '#fff', fontSize: 22, fontWeight: 800, marginBottom: 4 }}>
-          {title}{countryDef ? ` — ${countryDef.flag} ${countryDef.name}` : ''}
+          {title}{countryDef ? ` — ${countryDef.flag} ${countryLabel(countryDef, i18n.language)}` : ''}
         </h1>
         <p style={{ color: '#888', fontSize: 13, marginBottom: 28, lineHeight: 1.6 }}>{subtitle}</p>
 

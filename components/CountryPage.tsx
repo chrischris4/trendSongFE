@@ -5,21 +5,21 @@ import { useTranslation } from 'react-i18next';
 import Header from './Header';
 import Footer from './Footer';
 import TrackCard from './TrackCard';
-import { COUNTRIES, findCountry } from '../constants/config';
+import { COUNTRIES, findCountry, countryLabel } from '../constants/config';
 import { useTrending } from '../hooks/useTrending';
 import type { MusicType } from '../types';
 
 interface Props { code: string; type: MusicType }
 
 export default function CountryPage({ code, type }: Props) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const country = findCountry(code);
   const { items, loading, error } = useTrending(type, country?.code ?? 'US', 100);
 
-  const countryLabel = country ? `${country.flag} ${country.name}` : code.toUpperCase();
+  const label = country ? `${country.flag} ${countryLabel(country, i18n.language)}` : code.toUpperCase();
   const title = type === 'songs'
-    ? t('country.songs_title', { country: countryLabel })
-    : t('country.albums_title', { country: countryLabel });
+    ? t('country.songs_title', { country: label })
+    : t('country.albums_title', { country: label });
 
   const chip: React.CSSProperties = { padding: '6px 14px', borderRadius: 20, backgroundColor: '#1A1A1A', color: '#AAAAAA', fontSize: 13, fontWeight: 600, whiteSpace: 'nowrap', textDecoration: 'none', display: 'inline-block', border: '1px solid #2A2A2A' };
 
@@ -56,7 +56,7 @@ export default function CountryPage({ code, type }: Props) {
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             {COUNTRIES.filter(c => c.code !== country?.code).map(c => (
               <Link key={c.code} href={`/${type}/country/${c.code.toLowerCase()}`} style={chip}>
-                {c.flag} {c.name}
+                {c.flag} {countryLabel(c, i18n.language)}
               </Link>
             ))}
           </div>

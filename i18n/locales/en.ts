@@ -76,6 +76,9 @@ const en = {
   trending: {
     empty: 'No content available.',
   },
+  filters: {
+    all: 'All',
+  },
   stats: {
     title: 'Statistics',
     subtitle: 'Overview of the charts tracked by TrendSongs',

@@ -1,7 +1,8 @@
 'use client';
 import Link from 'next/link';
+import { useTranslation } from 'react-i18next';
 import HScrollWithArrows from './HScrollWithArrows';
-import { MUSIC_GENRES } from '../constants/config';
+import { MUSIC_GENRES, genreLabel } from '../constants/config';
 import type { MusicType } from '../types';
 
 interface Props {
@@ -11,6 +12,7 @@ interface Props {
 }
 
 export default function GenreFilter({ mediaType, selected, country }: Props) {
+  const { t, i18n } = useTranslation();
   function genreHref(slug: string | null) {
     const params = new URLSearchParams();
     if (mediaType === 'albums') params.set('type', 'albums');
@@ -33,21 +35,21 @@ export default function GenreFilter({ mediaType, selected, country }: Props) {
     <div className="genre-filter" style={root}>
       <div style={{ display: 'flex', alignItems: 'center', paddingLeft: 12, flexShrink: 0 }}>
         {!selected ? (
-          <span style={chipActive}>Tous</span>
+          <span style={chipActive}>{t('filters.all')}</span>
         ) : (
-          <Link href={genreHref(null)} style={chip} className="tab-hover">Tous</Link>
+          <Link href={genreHref(null)} style={chip} className="tab-hover">{t('filters.all')}</Link>
         )}
         <div style={sep} />
       </div>
       {selectedGenre && (
         <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
-          <span style={{ ...chipActive, marginLeft: 8 }}>{selectedGenre.label}</span>
+          <span style={{ ...chipActive, marginLeft: 8 }}>{genreLabel(selectedGenre, i18n.language)}</span>
           <div style={sep} />
         </div>
       )}
       <HScrollWithArrows contentContainerStyle={contentStyle}>
         {others.map(g => (
-          <Link key={g.id} href={genreHref(g.slug)} style={chip} className="tab-hover">{g.label}</Link>
+          <Link key={g.id} href={genreHref(g.slug)} style={chip} className="tab-hover">{genreLabel(g, i18n.language)}</Link>
         ))}
       </HScrollWithArrows>
     </div>

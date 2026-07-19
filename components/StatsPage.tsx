@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Header from './Header';
 import Footer from './Footer';
 import { useStats } from '../hooks/useStats';
-import { MUSIC_GENRES } from '../constants/config';
+import { MUSIC_GENRES, genreLabel } from '../constants/config';
 import { slugify } from '../utils/slug';
 import type { GenreStat } from '../types';
 
@@ -42,11 +42,13 @@ function StatCard({ value, label, sub }: { value: string | number; label: string
 }
 
 export default function StatsPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { stats, loading, error } = useStats();
 
-  const resolveGenre = (genreId: string, fallback: string) =>
-    MUSIC_GENRES.find(g => g.id === genreId)?.label ?? fallback;
+  const resolveGenre = (genreId: string, fallback: string) => {
+    const def = MUSIC_GENRES.find(g => g.id === genreId);
+    return def ? genreLabel(def, i18n.language) : fallback;
+  };
 
   const cardStyle: React.CSSProperties = {
     display: 'flex', alignItems: 'center', gap: 12,
@@ -153,7 +155,7 @@ export default function StatsPage() {
 
             {/* Last updated */}
             <p style={{ color: '#333', fontSize: 11, textAlign: 'center' }}>
-              {t('stats.last_updated')} : {new Date(stats.lastUpdated).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+              {t('stats.last_updated')} : {new Date(stats.lastUpdated).toLocaleDateString(i18n.language === 'fr' ? 'fr-FR' : 'en-US', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
             </p>
           </>
         ) : null}
