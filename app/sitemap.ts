@@ -1,11 +1,13 @@
 import type { MetadataRoute } from 'next';
 import { MUSIC_GENRES, COUNTRIES } from '../constants/config';
+import { slugify } from '../utils/slug';
 
-export const dynamic = 'force-static';
+export const runtime = 'edge';
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://trend-songs.com';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3002';
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes = ['', '/songs', '/albums', '/weekly', '/stats', '/blog', '/about', '/contact', '/privacy'].map(route => ({
     url: `${BASE_URL}${route}`,
     lastModified: new Date(),
@@ -31,5 +33,22 @@ export default function sitemap(): MetadataRoute.Sitemap {
     })),
   );
 
-  return [...staticRoutes, ...genreRoutes, ...countryRoutes];
+  // Articles publiés : une URL par article, ajoutée au fil des publications du cron
+  let blogRoutes: MetadataRoute.Sitemap = [];
+  try {
+    const res = await fetch(`${API_BASE}/blog`);
+    if (res.ok) {
+      const articles: { id: number; title: string; createdAt: string }[] = await res.json();
+      blogRoutes = articles.map(a => ({
+        url: `${BASE_URL}/blog/${slugify(a.title, String(a.id))}`,
+        lastModified: new Date(a.createdAt),
+        changeFrequency: 'monthly' as const,
+        priority: 0.7,
+      }));
+    }
+  } catch {
+    // API indisponible : le sitemap reste valide sans les articles
+  }
+
+  return [...staticRoutes, ...genreRoutes, ...countryRoutes, ...blogRoutes];
 }
