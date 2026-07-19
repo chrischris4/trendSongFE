@@ -36,7 +36,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Articles publiés : une URL par article, ajoutée au fil des publications du cron
   let blogRoutes: MetadataRoute.Sitemap = [];
   try {
-    const res = await fetch(`${API_BASE}/blog`);
+    const res = await fetch(`${API_BASE}/blog`, { cache: 'no-store' });
     if (res.ok) {
       const articles: { id: number; title: string; createdAt: string }[] = await res.json();
       blogRoutes = articles.map(a => ({
