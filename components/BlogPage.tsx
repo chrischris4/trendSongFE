@@ -83,7 +83,7 @@ function ArticleCard({ article, isFr, t }: { article: BlogArticle; isFr: boolean
       </div>
 
       <div style={{ padding: '18px 24px 24px' }}>
-        <p style={{ color: '#AAAAAA', fontSize: 14, lineHeight: 1.7, margin: 0 }}>
+        <p style={{ color: '#AAAAAA', fontSize: 14, lineHeight: 1.7, margin: 0, display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
           {isFr ? article.editorialFr : article.editorialEn}
         </p>
         <Link href={`/blog/${slugify(article.title, String(article.id))}`} style={{ display: 'inline-block', marginTop: 12, color: '#A78BFA', fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>
