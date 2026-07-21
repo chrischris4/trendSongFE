@@ -18,8 +18,11 @@ export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
   const name = nameFromSlug(slug);
   return {
-    title: `${name} — Album en tendance, titres et classements`,
+    title: `${name} - Album en tendance, titres et classements`,
     description: `Tracklist, extraits audio et classements par pays de l'album « ${name} », actuellement dans les charts Apple Music.`,
+    // Fiches album : métadonnées Apple non enrichies, exclues de l'index pour
+    // concentrer le crawl sur les classements et le contenu éditorial.
+    robots: { index: false, follow: true },
   };
 }
 

@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import Header from './Header';
 import Footer from './Footer';
 import TrackCard from './TrackCard';
+import EditorialSection from './EditorialSection';
 import { useTrending } from '../hooks/useTrending';
 import { useBlog } from '../hooks/useBlog';
 import { useAppStore } from '../store';
@@ -102,6 +103,7 @@ function TrendingContent({ type }: Props) {
           </div>
         )}
       </div>
+      <EditorialSection page={type === 'songs' ? 'songs' : 'albums'} />
       <Footer />
     </div>
   );

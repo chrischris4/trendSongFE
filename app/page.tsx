@@ -10,6 +10,8 @@ import TypeFilter from '../components/TypeFilter';
 import GenreFilter from '../components/GenreFilter';
 import CountryFilter from '../components/CountryFilter';
 import InsightBar from '../components/InsightBar';
+import EditorialSection from '../components/EditorialSection';
+import LatestArticles from '../components/LatestArticles';
 import { useTrending } from '../hooks/useTrending';
 import { useBlog } from '../hooks/useBlog';
 import { useAppStore } from '../store';
@@ -115,6 +117,10 @@ function HomeContent() {
           </div>
         )}
       </div>
+
+      <LatestArticles />
+
+      <EditorialSection page="home" />
 
       <Footer />
     </div>
