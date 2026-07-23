@@ -13,6 +13,8 @@ export async function generateMetadata({ params }: Props) {
   return {
     title: `Albums ${label} en tendance — Classement du moment`,
     description: `Les albums ${label} les plus écoutés en ce moment sur Apple Music. Mis à jour chaque jour.`,
+    robots: { index: Boolean(g), follow: true },
+    alternates: { canonical: `https://trend-songs.com/albums/genre/${genre}` },
   };
 }
 

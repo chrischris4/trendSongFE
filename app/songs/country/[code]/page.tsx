@@ -13,6 +13,8 @@ export async function generateMetadata({ params }: Props) {
   return {
     title: `Top titres ${name} ${c?.flag ?? ''} — Classement Apple Music du jour`,
     description: `Les titres les plus écoutés en ce moment · ${name}. Top 100 Apple Music mis à jour chaque jour, avec extraits audio et classements par pays.`,
+    robots: { index: Boolean(c), follow: true },
+    alternates: { canonical: `https://trend-songs.com/songs/country/${code.toLowerCase()}` },
   };
 }
 

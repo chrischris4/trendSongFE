@@ -8,7 +8,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://trend-songs.com';
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3002';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const staticRoutes = ['', '/songs', '/albums', '/weekly', '/stats', '/blog', '/about', '/contact', '/privacy'].map(route => ({
+  const staticRoutes = ['', '/songs', '/albums', '/weekly', '/stats', '/blog', '/about', '/methodology', '/contact', '/privacy'].map(route => ({
     url: `${BASE_URL}${route}`,
     lastModified: new Date(),
     changeFrequency: route === '' ? 'daily' : 'weekly',
@@ -38,8 +38,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     const res = await fetch(`${API_BASE}/blog`, { cache: 'no-store' });
     if (res.ok) {
-      const articles: { id: number; title: string; createdAt: string }[] = await res.json();
-      blogRoutes = articles.map(a => ({
+      const articles: { id: number; title: string; editorialEn: string; createdAt: string }[] = await res.json();
+      blogRoutes = articles
+      .filter(article => article.editorialEn.trim().split(/\s+/).filter(Boolean).length >= 350)
+      .map(a => ({
         url: `${BASE_URL}/blog/${slugify(a.title, String(a.id))}`,
         lastModified: new Date(a.createdAt),
         changeFrequency: 'monthly' as const,

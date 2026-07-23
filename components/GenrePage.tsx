@@ -26,6 +26,15 @@ export default function GenrePage({ genre, type }: Props) {
   const title = type === 'songs'
     ? t('genre.songs_title', { genre: label })
     : t('genre.albums_title', { genre: label });
+  const analysis = useMemo(() => {
+    if (!items.length) return null;
+    const artists = new Set(items.map(item => item.artistName)).size;
+    const leader = items[0];
+    const isFr = i18n.language === 'fr';
+    return isFr
+      ? `${leader.name} de ${leader.artistName} mène actuellement cette sélection ${label}. Le classement compte ${items.length} ${type === 'songs' ? 'morceaux' : 'albums'} signés par ${artists} artistes différents. Cet écart entre le nombre d’entrées et le nombre d’artistes permet de repérer les sorties qui occupent plusieurs places à la fois, au lieu de confondre volume de catalogue et diversité réelle.`
+      : `${leader.name} by ${leader.artistName} currently leads this ${label} selection. The ranking contains ${items.length} ${type === 'songs' ? 'tracks' : 'albums'} from ${artists} different artists. Comparing entries with unique artists helps reveal releases occupying several positions at once instead of mistaking catalogue volume for genuine diversity.`;
+  }, [items, type, label, i18n.language]);
 
   return (
     <div style={{ backgroundColor: '#0F0F0F', minHeight: '100vh' }}>
@@ -52,6 +61,18 @@ export default function GenrePage({ genre, type }: Props) {
           <div className="grid-cards">
             {items.map(item => <TrackCard key={item.id} item={item} />)}
           </div>
+        )}
+
+        {analysis && (
+          <section style={{ maxWidth: 800, marginTop: 48, paddingTop: 28, borderTop: '1px solid #2A2A2A' }}>
+            <h2 style={{ color: '#fff', fontSize: 19, marginBottom: 10 }}>
+              {i18n.language === 'fr' ? `Ce que révèle le classement ${label}` : `What the ${label} ranking reveals`}
+            </h2>
+            <p style={{ color: '#AAAAAA', fontSize: 15, lineHeight: 1.8 }}>{analysis}</p>
+            <a href="/methodology" style={{ color: '#A78BFA', fontSize: 13 }}>
+              {i18n.language === 'fr' ? 'Comprendre notre méthodologie' : 'Read our methodology'}
+            </a>
+          </section>
         )}
       </div>
       <Footer />

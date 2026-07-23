@@ -20,6 +20,8 @@ export default function CountryPage({ code, type }: Props) {
   const title = type === 'songs'
     ? t('country.songs_title', { country: label })
     : t('country.albums_title', { country: label });
+  const artists = new Set(items.map(item => item.artistName)).size;
+  const leader = items[0];
 
   const chip: React.CSSProperties = { padding: '6px 14px', borderRadius: 20, backgroundColor: '#1A1A1A', color: '#AAAAAA', fontSize: 13, fontWeight: 600, whiteSpace: 'nowrap', textDecoration: 'none', display: 'inline-block', border: '1px solid #2A2A2A' };
 
@@ -48,6 +50,22 @@ export default function CountryPage({ code, type }: Props) {
           <div className="grid-cards">
             {items.map(item => <TrackCard key={item.id} item={item} />)}
           </div>
+        )}
+
+        {leader && (
+          <section style={{ maxWidth: 800, marginTop: 48, paddingTop: 28, borderTop: '1px solid #2A2A2A' }}>
+            <h2 style={{ color: '#fff', fontSize: 19, marginBottom: 10 }}>
+              {i18n.language === 'fr' ? `Lecture du classement en ${label}` : `Reading the chart in ${label}`}
+            </h2>
+            <p style={{ color: '#AAAAAA', fontSize: 15, lineHeight: 1.8 }}>
+              {i18n.language === 'fr'
+                ? `${leader.name} de ${leader.artistName} occupe la première place de ce relevé. Le top rassemble ${items.length} ${type === 'songs' ? 'morceaux' : 'albums'} et ${artists} artistes différents. Comparer cette concentration avec les autres pays permet de voir si le marché récompense une sortie dominante ou un catalogue plus dispersé.`
+                : `${leader.name} by ${leader.artistName} holds the top position in this snapshot. The chart contains ${items.length} ${type === 'songs' ? 'tracks' : 'albums'} and ${artists} different artists. Comparing that concentration with other countries shows whether the market is rewarding one dominant release or a more dispersed catalogue.`}
+            </p>
+            <Link href="/methodology" style={{ color: '#A78BFA', fontSize: 13 }}>
+              {i18n.language === 'fr' ? 'Comprendre notre méthodologie' : 'Read our methodology'}
+            </Link>
+          </section>
         )}
 
         {/* SEO interlinking between country charts */}

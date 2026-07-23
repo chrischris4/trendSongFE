@@ -68,9 +68,25 @@ export default function ArticlePage({ id }: { id: number }) {
   const hasStructuredSections = article.items?.some(item =>
     Boolean(item.sectionTextFr || item.sectionTextEn || item.sectionTitleFr || item.sectionTitleEn),
   ) || article.items?.length > 1;
+  const articleUrl = `https://trend-songs.com/blog/${slugify(title, String(article.id))}`;
+  const publishedAt = new Date(article.createdAt).toISOString();
 
   return (
     <div style={{ backgroundColor: '#0F0F0F', minHeight: '100vh' }}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'AnalysisNewsArticle',
+          headline: title,
+          datePublished: publishedAt,
+          dateModified: publishedAt,
+          mainEntityOfPage: articleUrl,
+          author: { '@type': 'Organization', name: 'TrendSongs Editorial' },
+          publisher: { '@type': 'Organization', name: 'TrendSongs', url: 'https://trend-songs.com' },
+          ...(artworkUrl ? { image: artworkUrl } : {}),
+        }) }}
+      />
       <Header />
       <div style={{ maxWidth: 720, margin: '0 auto', padding: '32px 16px 64px' }}>
         <Link href="/blog" style={{ color: '#888', fontSize: 13, textDecoration: 'none' }}>← {t('blog.title')}</Link>
@@ -87,6 +103,10 @@ export default function ArticlePage({ id }: { id: number }) {
 
         <h1 style={{ color: '#fff', fontSize: 'clamp(20px, 4vw, 28px)', fontWeight: 800, lineHeight: 1.3, marginBottom: 6 }}>{title}</h1>
         {artistName && <p style={{ color: '#A78BFA', fontSize: 15, fontWeight: 600, marginBottom: 20 }}>{artistName}</p>}
+        <p style={{ color: '#888', fontSize: 12, lineHeight: 1.6, margin: '-8px 0 20px' }}>
+          {isFr ? 'Par la rédaction TrendSongs, à partir des classements Apple Music par pays.' : 'By the TrendSongs editorial team, using country-level Apple Music charts.'}{' '}
+          <Link href="/methodology" style={{ color: '#A78BFA' }}>{isFr ? 'Notre méthodologie' : 'Our methodology'}</Link>
+        </p>
 
         <div style={{ display: 'flex', gap: 18, alignItems: 'flex-start', marginBottom: 24, flexWrap: 'wrap' }}>
           {artworkUrl && !hasStructuredSections && (
