@@ -16,6 +16,7 @@ import { useTrending } from '../hooks/useTrending';
 import { useBlog } from '../hooks/useBlog';
 import { useAppStore } from '../store';
 import { MUSIC_GENRES, DEFAULT_COUNTRY, artwork, findCountry } from '../constants/config';
+import { articleExcerpt, articleTitle, heroItem } from '../utils/blog';
 import type { MusicType } from '../types';
 
 function HomeContent() {
@@ -31,12 +32,16 @@ function HomeContent() {
   const { items, loading, error } = useTrending(mediaType, country, 100);
   const { articles } = useBlog();
   const lang = useAppStore(s => s.lang);
+  const isFr = lang === 'fr';
 
   const featuredArticle = useMemo(() => {
     const filtered = articles.filter(a => a.type === mediaType);
     if (filtered.length === 0) return null;
     return filtered[Math.floor(Math.random() * filtered.length)];
   }, [articles, mediaType]);
+  const featuredHero = featuredArticle ? heroItem(featuredArticle) : null;
+  const featuredArtwork = featuredHero?.artworkUrl ?? featuredArticle?.artworkUrl;
+  const featuredTitle = featuredArticle ? articleTitle(featuredArticle, isFr) : '';
 
   const filtered = useMemo(() => {
     if (genreId === null) return items;
@@ -75,10 +80,10 @@ function HomeContent() {
               onMouseEnter={e => (e.currentTarget.style.borderColor = '#7C3AED')}
               onMouseLeave={e => (e.currentTarget.style.borderColor = '#2A2A2A')}
             >
-              {featuredArticle.artworkUrl && (
+              {featuredArtwork && (
                 <img
-                  src={artwork(featuredArticle.artworkUrl, 200) ?? undefined}
-                  alt={featuredArticle.title}
+                  src={artwork(featuredArtwork, 200) ?? undefined}
+                  alt={featuredTitle}
                   style={{ width: 64, height: 64, objectFit: 'cover', borderRadius: 6, flexShrink: 0 }}
                 />
               )}
@@ -87,10 +92,10 @@ function HomeContent() {
                   {lang === 'fr' ? 'Article du blog' : 'Blog post'}
                 </span>
                 <p style={{ color: '#fff', fontSize: 13, fontWeight: 600, margin: '3px 0 4px', lineHeight: 1.3, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical' }}>
-                  {featuredArticle.title}
+                  {featuredTitle}
                 </p>
                 <p style={{ color: '#888', fontSize: 12, margin: 0, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', lineHeight: 1.5 }}>
-                  {lang === 'fr' ? featuredArticle.editorialFr : featuredArticle.editorialEn}
+                  {articleExcerpt(featuredArticle, isFr)}
                 </p>
               </div>
             </div>

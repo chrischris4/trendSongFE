@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useBlog } from '../hooks/useBlog';
 import { useAppStore } from '../store';
 import { artwork } from '../constants/config';
+import { articleExcerpt, articleTitle, heroItem } from '../utils/blog';
 import { slugify } from '../utils/slug';
 
 export default function LatestArticles({ limit = 3 }: { limit?: number }) {
@@ -29,25 +30,29 @@ export default function LatestArticles({ limit = 3 }: { limit?: number }) {
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 14 }}>
         {latest.map(a => {
-          const cover = a.artworkUrl ? artwork(a.artworkUrl, 200) : null;
-          const excerpt = (isFr ? a.editorialFr : a.editorialEn) ?? '';
+          const primary = heroItem(a);
+          const artworkPath = primary?.artworkUrl ?? a.artworkUrl;
+          const cover = artworkPath ? artwork(artworkPath, 200) : null;
+          const title = articleTitle(a, isFr);
+          const excerpt = articleExcerpt(a, isFr);
+          const artistName = primary?.artistName ?? a.artistName;
           return (
             <Link
               key={a.id}
-              href={`/blog/${slugify(a.title, String(a.id))}`}
+              href={`/blog/${slugify(title, String(a.id))}`}
               style={{ display: 'flex', gap: 12, backgroundColor: '#141414', border: '1px solid #2A2A2A', borderRadius: 12, padding: 12, textDecoration: 'none', transition: 'border-color 150ms' }}
               onMouseEnter={e => (e.currentTarget.style.borderColor = '#7C3AED')}
               onMouseLeave={e => (e.currentTarget.style.borderColor = '#2A2A2A')}
             >
               {cover && (
-                <img src={cover} alt={a.title} loading="lazy" style={{ width: 64, height: 64, objectFit: 'cover', borderRadius: 8, flexShrink: 0 }} />
+                <img src={cover} alt={title} loading="lazy" style={{ width: 64, height: 64, objectFit: 'cover', borderRadius: 8, flexShrink: 0 }} />
               )}
               <span style={{ flex: 1, minWidth: 0 }}>
                 <span style={{ display: 'block', color: '#fff', fontSize: 13, fontWeight: 700, lineHeight: 1.35, marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {a.title}
+                  {title}
                 </span>
                 <span style={{ display: 'block', color: '#A78BFA', fontSize: 11, fontWeight: 600, marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {a.artistName}
+                  {artistName}
                 </span>
                 <span style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', color: '#888', fontSize: 12, lineHeight: 1.6 }}>
                   {excerpt}

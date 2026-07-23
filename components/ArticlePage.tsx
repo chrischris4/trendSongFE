@@ -8,6 +8,15 @@ import { useBlog } from '../hooks/useBlog';
 import { useAppStore } from '../store';
 import { artwork } from '../constants/config';
 import { slugify } from '../utils/slug';
+import {
+  articleConclusion,
+  articleIntro,
+  articleTitle,
+  formatLabel,
+  heroItem,
+  itemSectionText,
+  itemSectionTitle,
+} from '../utils/blog';
 
 function formatStreams(n: number): string {
   if (n >= 1_000_000_000) return `${(n / 1_000_000_000).toFixed(1)}B`;
@@ -46,7 +55,19 @@ export default function ArticlePage({ id }: { id: number }) {
     </div>
   );
 
-  const artworkUrl = article.artworkUrl ? artwork(article.artworkUrl, 400) : null;
+  const title = articleTitle(article, isFr);
+  const primary = heroItem(article);
+  const artworkPath = primary?.artworkUrl ?? article.artworkUrl;
+  const artworkUrl = artworkPath ? artwork(artworkPath, 400) : null;
+  const artistName = primary?.artistName ?? article.artistName;
+  const streamCount = primary?.streamCount ?? article.streamCount;
+  const countryCount = primary?.countryCount ?? article.countryCount;
+  const articleType = primary?.type ?? article.type;
+  const intro = articleIntro(article, isFr);
+  const conclusion = articleConclusion(article, isFr);
+  const hasStructuredSections = article.items?.some(item =>
+    Boolean(item.sectionTextFr || item.sectionTextEn || item.sectionTitleFr || item.sectionTitleEn),
+  ) || article.items?.length > 1;
 
   return (
     <div style={{ backgroundColor: '#0F0F0F', minHeight: '100vh' }}>
@@ -56,7 +77,7 @@ export default function ArticlePage({ id }: { id: number }) {
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, margin: '20px 0 10px' }}>
           <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, background: 'linear-gradient(90deg,#7C3AED,#EC4899)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-            {t('blog.high_impact')}
+            {formatLabel(article.format ?? 'SIMPLE', isFr)}
           </span>
           <span style={{ color: '#444', fontSize: 11 }}>·</span>
           <span style={{ fontSize: 11, color: '#555', textTransform: 'capitalize' }}>
@@ -64,53 +85,84 @@ export default function ArticlePage({ id }: { id: number }) {
           </span>
         </div>
 
-        <h1 style={{ color: '#fff', fontSize: 'clamp(20px, 4vw, 28px)', fontWeight: 800, lineHeight: 1.3, marginBottom: 6 }}>{article.title}</h1>
-        {article.artistName && <p style={{ color: '#A78BFA', fontSize: 15, fontWeight: 600, marginBottom: 20 }}>{article.artistName}</p>}
+        <h1 style={{ color: '#fff', fontSize: 'clamp(20px, 4vw, 28px)', fontWeight: 800, lineHeight: 1.3, marginBottom: 6 }}>{title}</h1>
+        {artistName && <p style={{ color: '#A78BFA', fontSize: 15, fontWeight: 600, marginBottom: 20 }}>{artistName}</p>}
 
         <div style={{ display: 'flex', gap: 18, alignItems: 'flex-start', marginBottom: 24, flexWrap: 'wrap' }}>
-          {artworkUrl && (
-            <img src={artworkUrl} alt={article.title} style={{ width: 160, aspectRatio: '1/1', objectFit: 'cover', borderRadius: 12, border: '1px solid #2A2A2A', flexShrink: 0 }} />
+          {artworkUrl && !hasStructuredSections && (
+            <img src={artworkUrl} alt={title} style={{ width: 160, aspectRatio: '1/1', objectFit: 'cover', borderRadius: 12, border: '1px solid #2A2A2A', flexShrink: 0 }} />
           )}
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignContent: 'flex-start', flex: 1, minWidth: 200 }}>
-            {article.streamCount != null && (
+            {streamCount != null && (
               <div style={{ backgroundColor: '#1A1A1A', border: '1px solid #2A2A2A', borderRadius: 20, padding: '4px 14px', fontSize: 12, color: '#ddd', height: 'fit-content' }}>
-                <span style={{ color: '#A78BFA', fontWeight: 700 }}>{formatStreams(Number(article.streamCount))}</span> {t('blog.streams')}
+                <span style={{ color: '#A78BFA', fontWeight: 700 }}>{formatStreams(Number(streamCount))}</span> {t('blog.streams')}
               </div>
             )}
-            {article.countryCount != null && (
+            {countryCount != null && (
               <div style={{ backgroundColor: '#1A1A1A', border: '1px solid #2A2A2A', borderRadius: 20, padding: '4px 14px', fontSize: 12, color: '#ddd', height: 'fit-content' }}>
-                {t('blog.trending_in')} <span style={{ color: '#A78BFA', fontWeight: 700 }}>{article.countryCount}</span> {t('blog.countries')}
+                {t('blog.trending_in')} <span style={{ color: '#A78BFA', fontWeight: 700 }}>{countryCount}</span> {t('blog.countries')}
               </div>
             )}
-            {article.type && (
+            {articleType && (
               <div style={{ backgroundColor: '#1A1A1A', border: '1px solid #2A2A2A', borderRadius: 20, padding: '4px 14px', fontSize: 12, color: '#ddd', height: 'fit-content' }}>
-                {article.type === 'songs' ? t('card.song') : t('card.album')}
+                {articleType === 'songs' ? t('card.song') : t('card.album')}
               </div>
             )}
           </div>
         </div>
 
-        <p style={{ color: '#CCCCCC', fontSize: 15, lineHeight: 1.9, marginBottom: 40 }}>
-          {isFr ? article.editorialFr : article.editorialEn}
-        </p>
+        {hasStructuredSections ? (
+          <div style={{ marginBottom: 40 }}>
+            {intro && <p style={{ color: '#CCCCCC', fontSize: 15, lineHeight: 1.9, marginBottom: 28, whiteSpace: 'pre-line' }}>{intro}</p>}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+              {article.items.map(item => {
+                const itemArtwork = item.artworkUrl ? artwork(item.artworkUrl, 400) : null;
+                const sectionTitle = itemSectionTitle(item, isFr);
+                const sectionText = itemSectionText(item, isFr);
+                return (
+                  <section key={item.id ?? `${article.id}-${item.position}`} style={{ display: 'flex', gap: 18, alignItems: 'flex-start', padding: 18, backgroundColor: '#141414', border: '1px solid #2A2A2A', borderRadius: 12, flexWrap: 'wrap' }}>
+                    {itemArtwork && <img src={itemArtwork} alt={item.title} loading="lazy" style={{ width: 130, height: 130, objectFit: 'cover', borderRadius: 9, flexShrink: 0 }} />}
+                    <div style={{ flex: 1, minWidth: 220 }}>
+                      <span style={{ color: '#A78BFA', fontSize: 11, fontWeight: 800 }}>{String(item.position).padStart(2, '0')}</span>
+                      <h2 style={{ color: '#fff', fontSize: 19, lineHeight: 1.35, margin: '5px 0 4px' }}>{sectionTitle}</h2>
+                      {sectionTitle !== item.title && <p style={{ color: '#AAAAAA', fontSize: 13, fontWeight: 600, margin: '0 0 4px' }}>{item.title}</p>}
+                      <p style={{ color: '#A78BFA', fontSize: 12, margin: '0 0 12px' }}>{item.artistName}</p>
+                      {sectionText && <p style={{ color: '#CCCCCC', fontSize: 14, lineHeight: 1.8, margin: 0, whiteSpace: 'pre-line' }}>{sectionText}</p>}
+                    </div>
+                  </section>
+                );
+              })}
+            </div>
+            {conclusion && <p style={{ color: '#CCCCCC', fontSize: 15, lineHeight: 1.9, margin: '28px 0 0', whiteSpace: 'pre-line' }}>{conclusion}</p>}
+          </div>
+        ) : (
+          <p style={{ color: '#CCCCCC', fontSize: 15, lineHeight: 1.9, marginBottom: 40, whiteSpace: 'pre-line' }}>
+            {isFr ? article.editorialFr : article.editorialEn}
+          </p>
+        )}
 
         {others.length > 0 && (
           <div style={{ borderTop: '1px solid #2A2A2A', paddingTop: 24 }}>
             <h2 style={{ color: '#fff', fontSize: 15, fontWeight: 700, marginBottom: 14 }}>{isFr ? 'Autres analyses' : 'More analyses'}</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {others.map(a => (
-                <Link key={a.id} href={`/blog/${slugify(a.title, String(a.id))}`}
-                  style={{ display: 'flex', alignItems: 'center', gap: 12, backgroundColor: '#141414', border: '1px solid #2A2A2A', borderRadius: 10, padding: '10px 14px', textDecoration: 'none', transition: 'border-color 150ms' }}
-                  onMouseEnter={e => (e.currentTarget.style.borderColor = '#7C3AED')}
-                  onMouseLeave={e => (e.currentTarget.style.borderColor = '#2A2A2A')}
-                >
-                  {a.artworkUrl && <img src={artwork(a.artworkUrl, 200) ?? undefined} alt={a.title} style={{ width: 44, height: 44, objectFit: 'cover', borderRadius: 6, flexShrink: 0 }} />}
-                  <span style={{ flex: 1, minWidth: 0 }}>
-                    <span style={{ display: 'block', color: '#fff', fontSize: 13, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.title}</span>
-                    <span style={{ display: 'block', color: '#888', fontSize: 12 }}>{a.artistName}</span>
-                  </span>
-                </Link>
-              ))}
+              {others.map(a => {
+                const otherTitle = articleTitle(a, isFr);
+                const otherHero = heroItem(a);
+                const otherArtwork = otherHero?.artworkUrl ?? a.artworkUrl;
+                return (
+                  <Link key={a.id} href={`/blog/${slugify(otherTitle, String(a.id))}`}
+                    style={{ display: 'flex', alignItems: 'center', gap: 12, backgroundColor: '#141414', border: '1px solid #2A2A2A', borderRadius: 10, padding: '10px 14px', textDecoration: 'none', transition: 'border-color 150ms' }}
+                    onMouseEnter={e => (e.currentTarget.style.borderColor = '#7C3AED')}
+                    onMouseLeave={e => (e.currentTarget.style.borderColor = '#2A2A2A')}
+                  >
+                    {otherArtwork && <img src={artwork(otherArtwork, 200) ?? undefined} alt={otherTitle} style={{ width: 44, height: 44, objectFit: 'cover', borderRadius: 6, flexShrink: 0 }} />}
+                    <span style={{ flex: 1, minWidth: 0 }}>
+                      <span style={{ display: 'block', color: '#fff', fontSize: 13, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{otherTitle}</span>
+                      <span style={{ display: 'block', color: '#888', fontSize: 12 }}>{otherHero?.artistName ?? a.artistName}</span>
+                    </span>
+                  </Link>
+                );
+              })}
             </div>
           </div>
         )}

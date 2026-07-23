@@ -19,11 +19,41 @@ export interface TrendingItem {
   fetchedAt: string;
 }
 
+export type BlogArticleFormat =
+  | 'SIMPLE'
+  | 'SUGGESTION'
+  | 'TOP_10'
+  | 'GUIDE'
+  | 'DATA_ANALYSIS'
+  | 'FACE_TO_FACE'
+  | 'PORTRAIT'
+  | 'RETROSPECTIVE';
+
+export interface BlogArticleItem {
+  id: number;
+  articleId: number;
+  position: number;
+  appleId: string | null;
+  type: 'songs' | 'albums' | null;
+  title: string;
+  artistName: string;
+  artworkUrl: string | null;
+  streamCount: number | null;
+  countryCount: number | null;
+  sectionTitleFr: string | null;
+  sectionTitleEn: string | null;
+  sectionTextFr: string | null;
+  sectionTextEn: string | null;
+}
+
 export interface BlogArticle {
   id: number;
+  format: BlogArticleFormat;
   appleId: string | null;
   type: string | null;
   title: string;
+  titleFr: string | null;
+  titleEn: string | null;
   artistName: string;
   artworkUrl: string | null;
   streamCount: number | null;
@@ -31,6 +61,11 @@ export interface BlogArticle {
   weekOf: string;
   editorialFr: string;
   editorialEn: string;
+  introFr: string | null;
+  introEn: string | null;
+  conclusionFr: string | null;
+  conclusionEn: string | null;
+  items: BlogArticleItem[];
   published: boolean;
   createdAt: string;
 }

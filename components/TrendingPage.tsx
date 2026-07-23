@@ -11,6 +11,7 @@ import { useTrending } from '../hooks/useTrending';
 import { useBlog } from '../hooks/useBlog';
 import { useAppStore } from '../store';
 import { artwork, DEFAULT_COUNTRY, findCountry, countryLabel } from '../constants/config';
+import { articleExcerpt, articleTitle, heroItem } from '../utils/blog';
 import type { MusicType } from '../types';
 
 interface Props { type: MusicType }
@@ -23,12 +24,16 @@ function TrendingContent({ type }: Props) {
   const { items, loading, error } = useTrending(type, country, 100);
   const { articles } = useBlog();
   const lang = useAppStore(s => s.lang);
+  const isFr = lang === 'fr';
 
   const featuredArticle = useMemo(() => {
     const filtered = articles.filter(a => a.type === type);
     if (filtered.length === 0) return null;
     return filtered[Math.floor(Math.random() * filtered.length)];
   }, [articles, type]);
+  const featuredHero = featuredArticle ? heroItem(featuredArticle) : null;
+  const featuredArtwork = featuredHero?.artworkUrl ?? featuredArticle?.artworkUrl;
+  const featuredTitle = featuredArticle ? articleTitle(featuredArticle, isFr) : '';
 
   const title      = type === 'songs' ? t('songs.title')       : t('albums.title');
   const subtitle   = type === 'songs' ? t('songs.subtitle')    : t('albums.subtitle');
@@ -59,10 +64,10 @@ function TrendingContent({ type }: Props) {
               onMouseEnter={e => (e.currentTarget.style.borderColor = '#7C3AED')}
               onMouseLeave={e => (e.currentTarget.style.borderColor = '#2A2A2A')}
             >
-              {featuredArticle.artworkUrl && (
+              {featuredArtwork && (
                 <img
-                  src={artwork(featuredArticle.artworkUrl, 200) ?? undefined}
-                  alt={featuredArticle.title}
+                  src={artwork(featuredArtwork, 200) ?? undefined}
+                  alt={featuredTitle}
                   style={{ width: 64, height: 64, objectFit: 'cover', borderRadius: 6, flexShrink: 0 }}
                 />
               )}
@@ -71,10 +76,10 @@ function TrendingContent({ type }: Props) {
                   {lang === 'fr' ? 'Article du blog' : 'Blog post'}
                 </span>
                 <p style={{ color: '#fff', fontSize: 13, fontWeight: 600, margin: '3px 0 4px', lineHeight: 1.3, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical' }}>
-                  {featuredArticle.title}
+                  {featuredTitle}
                 </p>
                 <p style={{ color: '#888', fontSize: 12, margin: 0, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', lineHeight: 1.5 }}>
-                  {lang === 'fr' ? featuredArticle.editorialFr : featuredArticle.editorialEn}
+                  {articleExcerpt(featuredArticle, isFr)}
                 </p>
               </div>
             </div>

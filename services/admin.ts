@@ -1,4 +1,4 @@
-import type { BlogArticle } from '../types';
+import type { BlogArticle, BlogArticleFormat, BlogArticleItem } from '../types';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3002';
 const ADMIN_KEY = process.env.NEXT_PUBLIC_ADMIN_API_KEY ?? '';
@@ -14,6 +14,14 @@ async function adminFetch(path: string, options: RequestInit = {}) {
 }
 
 export interface BlogArticlePayload {
+  format?: BlogArticleFormat;
+  titleFr?: string;
+  titleEn?: string;
+  introFr?: string;
+  introEn?: string;
+  conclusionFr?: string;
+  conclusionEn?: string;
+  items?: Omit<BlogArticleItem, 'id' | 'articleId'>[];
   appleId?: string;
   type?: string;
   title: string;

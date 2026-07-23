@@ -8,6 +8,7 @@ import Footer from './Footer';
 import { useBlog } from '../hooks/useBlog';
 import { useAppStore } from '../store';
 import { artwork } from '../constants/config';
+import { articleExcerpt, articleTitle, formatLabel, heroItem } from '../utils/blog';
 import { slugify } from '../utils/slug';
 import type { BlogArticle } from '../types';
 
@@ -19,13 +20,20 @@ function formatStreams(n: number): string {
 }
 
 function ArticleCard({ article, isFr, t }: { article: BlogArticle; isFr: boolean; t: (k: string) => string }) {
-  const artworkUrl = article.artworkUrl ? artwork(article.artworkUrl, 300) : null;
+  const title = articleTitle(article, isFr);
+  const primary = heroItem(article);
+  const artworkPath = primary?.artworkUrl ?? article.artworkUrl;
+  const artworkUrl = artworkPath ? artwork(artworkPath, 300) : null;
+  const artistName = primary?.artistName ?? article.artistName;
+  const streamCount = primary?.streamCount ?? article.streamCount;
+  const countryCount = primary?.countryCount ?? article.countryCount;
+  const articleType = primary?.type ?? article.type;
 
   return (
     <div style={{ backgroundColor: '#141414', border: '1px solid #2A2A2A', borderRadius: 12, overflow: 'hidden', marginBottom: 32 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '14px 24px 12px' }}>
         <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, background: 'linear-gradient(90deg,#7C3AED,#EC4899)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-          {t('blog.high_impact')}
+          {formatLabel(article.format, isFr)}
         </span>
         <span style={{ color: '#444', fontSize: 11 }}>·</span>
         <span style={{ fontSize: 11, color: '#555', textTransform: 'capitalize' }}>
@@ -37,45 +45,45 @@ function ArticleCard({ article, isFr, t }: { article: BlogArticle; isFr: boolean
         {artworkUrl && (
           <img
             src={artworkUrl}
-            alt={article.title}
+            alt={title}
             loading="lazy"
             style={{ width: 130, aspectRatio: '1/1', objectFit: 'cover', borderRadius: 10, flexShrink: 0, border: '1px solid #2A2A2A' }}
           />
         )}
         <div style={{ flex: 1, minWidth: 0 }}>
-          <Link href={`/blog/${slugify(article.title, String(article.id))}`} style={{ textDecoration: 'none' }}>
+          <Link href={`/blog/${slugify(title, String(article.id))}`} style={{ textDecoration: 'none' }}>
             <h2
               style={{ color: '#fff', fontSize: 17, fontWeight: 700, margin: '0 0 6px', lineHeight: 1.4, transition: 'color 150ms' }}
               onMouseEnter={e => (e.currentTarget.style.color = '#A78BFA')}
               onMouseLeave={e => (e.currentTarget.style.color = '#fff')}
             >
-              {article.title}
+              {title}
             </h2>
           </Link>
-          {article.artistName && (
-            <p style={{ color: '#AAAAAA', fontSize: 13, margin: '0 0 16px' }}>{article.artistName}</p>
+          {artistName && (
+            <p style={{ color: '#AAAAAA', fontSize: 13, margin: '0 0 16px' }}>{artistName}</p>
           )}
 
           <p style={{ color: '#555', fontSize: 11, margin: '0 0 8px', textTransform: 'uppercase', letterSpacing: 0.5 }}>
             {t('blog.data_label')}
           </p>
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-            {article.streamCount != null && (
+            {streamCount != null && (
               <div style={{ backgroundColor: '#1A1A1A', border: '1px solid #2A2A2A', borderRadius: 20, padding: '4px 14px', fontSize: 12, color: '#ddd' }}>
-                <span style={{ color: '#A78BFA', fontWeight: 700 }}>{formatStreams(Number(article.streamCount))}</span>
+                <span style={{ color: '#A78BFA', fontWeight: 700 }}>{formatStreams(Number(streamCount))}</span>
                 {' '}{t('blog.streams')}
               </div>
             )}
-            {article.countryCount != null && (
+            {countryCount != null && (
               <div style={{ backgroundColor: '#1A1A1A', border: '1px solid #2A2A2A', borderRadius: 20, padding: '4px 14px', fontSize: 12, color: '#ddd' }}>
                 {t('blog.trending_in')}{' '}
-                <span style={{ color: '#A78BFA', fontWeight: 700 }}>{article.countryCount}</span>
+                <span style={{ color: '#A78BFA', fontWeight: 700 }}>{countryCount}</span>
                 {' '}{t('blog.countries')}
               </div>
             )}
-            {article.type && (
+            {articleType && (
               <div style={{ backgroundColor: '#1A1A1A', border: '1px solid #2A2A2A', borderRadius: 20, padding: '4px 14px', fontSize: 12, color: '#ddd' }}>
-                {article.type === 'songs' ? t('card.song') : t('card.album')}
+                {articleType === 'songs' ? t('card.song') : t('card.album')}
               </div>
             )}
           </div>
@@ -84,9 +92,9 @@ function ArticleCard({ article, isFr, t }: { article: BlogArticle; isFr: boolean
 
       <div style={{ padding: '18px 24px 24px' }}>
         <p style={{ color: '#AAAAAA', fontSize: 14, lineHeight: 1.7, margin: 0, display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-          {isFr ? article.editorialFr : article.editorialEn}
+          {articleExcerpt(article, isFr)}
         </p>
-        <Link href={`/blog/${slugify(article.title, String(article.id))}`} style={{ display: 'inline-block', marginTop: 12, color: '#A78BFA', fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>
+        <Link href={`/blog/${slugify(title, String(article.id))}`} style={{ display: 'inline-block', marginTop: 12, color: '#A78BFA', fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>
           {t('blog.read_more')} →
         </Link>
       </div>
