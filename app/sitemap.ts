@@ -5,7 +5,7 @@ import { slugify } from '../utils/slug';
 export const runtime = 'edge';
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://trend-songs.com';
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3002';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'https://trendsongbe-production.up.railway.app';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes = ['', '/songs', '/albums', '/weekly', '/stats', '/blog', '/about', '/methodology', '/contact', '/privacy'].map(route => ({

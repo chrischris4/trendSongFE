@@ -1,6 +1,6 @@
 import type { TrendingItem, BlogArticle, StatsData, MusicType } from '../types';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3002';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'https://trendsongbe-production.up.railway.app';
 const TTL = 5 * 60 * 1000;
 const memCache = new Map<string, { data: unknown; ts: number }>();
 

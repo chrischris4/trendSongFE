@@ -1,6 +1,6 @@
 import type { BlogArticle, BlogArticleFormat, BlogArticleItem } from '../types';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3002';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'https://trendsongbe-production.up.railway.app';
 
 function adminKey(): string {
   return typeof window === 'undefined' ? '' : sessionStorage.getItem('trend_admin_key') ?? '';
