@@ -3,6 +3,7 @@ import { MUSIC_GENRES, COUNTRIES } from '../constants/config';
 import { slugify } from '../utils/slug';
 import { articleTitle, articleWordCount } from '../utils/blog';
 import { getBlogArticles } from '../services/serverApi';
+import { countryInsights, genreInsights } from '../constants/insights';
 
 export const runtime = 'edge';
 // Sinon le sitemap est figé au build et n'inclut jamais les articles publiés depuis.
@@ -15,15 +16,17 @@ const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://trend-songs.com';
 const url = (path: string) => `${BASE_URL}${path}/`.replace(/\/+$/, '/');
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const staticRoutes = ['', '/songs', '/albums', '/weekly', '/stats', '/blog', '/about', '/methodology', '/contact', '/privacy'].map(route => ({
+  const staticRoutes = ['', '/songs', '/albums', '/weekly', '/stats', '/blog', '/markets', '/about', '/methodology', '/contact', '/privacy'].map(route => ({
     url: url(route),
     lastModified: new Date(),
     changeFrequency: route === '' ? 'daily' : 'weekly',
     priority: route === '' ? 1 : 0.8,
   })) as MetadataRoute.Sitemap;
 
+  // On ne soumet au crawl que les pages disposant d'un texte éditorial propre.
+  // Même filtre que le `robots.index` des routes correspondantes.
   const genreRoutes = (['songs', 'albums'] as const).flatMap(base =>
-    MUSIC_GENRES.map(g => ({
+    MUSIC_GENRES.filter(g => Boolean(genreInsights[g.slug])).map(g => ({
       url: url(`/${base}/genre/${g.slug}`),
       lastModified: new Date(),
       changeFrequency: 'weekly' as const,
@@ -32,7 +35,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   );
 
   const countryRoutes = (['songs', 'albums'] as const).flatMap(base =>
-    COUNTRIES.map(c => ({
+    COUNTRIES.filter(c => Boolean(countryInsights[c.code])).map(c => ({
       url: url(`/${base}/country/${c.code.toLowerCase()}`),
       lastModified: new Date(),
       changeFrequency: 'daily' as const,

@@ -3,6 +3,7 @@ export const runtime = 'edge';
 import GenrePage from '../../../../components/GenrePage';
 import { getTrendingItems } from '../../../../services/serverApi';
 import { DEFAULT_COUNTRY, MUSIC_GENRES } from '../../../../constants/config';
+import { genreInsights } from '../../../../constants/insights';
 
 interface Props { params: Promise<{ genre: string }> }
 
@@ -13,7 +14,7 @@ export async function generateMetadata({ params }: Props) {
   return {
     title: `Titres ${label} en tendance — Classement du moment`,
     description: `Les morceaux ${label} les plus écoutés en ce moment sur Apple Music, avec extraits audio. Mis à jour chaque jour.`,
-    robots: { index: Boolean(g), follow: true },
+    robots: { index: Boolean(g && genreInsights[genre]), follow: true },
     alternates: { canonical: `https://trend-songs.com/songs/genre/${genre}` },
   };
 }

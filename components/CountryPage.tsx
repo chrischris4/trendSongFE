@@ -7,6 +7,7 @@ import Footer from './Footer';
 import TrackCard from './TrackCard';
 import { COUNTRIES, findCountry, countryLabel } from '../constants/config';
 import { useTrending } from '../hooks/useTrending';
+import { countryInsights } from '../constants/insights';
 import type { MusicType, TrendingItem } from '../types';
 
 interface Props {
@@ -22,6 +23,7 @@ export default function CountryPage({ code, type, initialItems, initialKey }: Pr
   const country = findCountry(code);
   const { items, loading, error } = useTrending(type, country?.code ?? 'US', 100, initialItems, initialKey);
 
+  const insight = country ? (countryInsights[country.code]?.[i18n.language === 'fr' ? 'fr' : 'en'] ?? null) : null;
   const label = country ? `${country.flag} ${countryLabel(country, i18n.language)}` : code.toUpperCase();
   const title = type === 'songs'
     ? t('country.songs_title', { country: label })
@@ -36,7 +38,10 @@ export default function CountryPage({ code, type, initialItems, initialKey }: Pr
       <Header />
       <div style={{ maxWidth: 1280, margin: '0 auto', padding: '32px 16px 64px' }}>
         <h1 style={{ color: '#fff', fontSize: 22, fontWeight: 800, marginBottom: 4 }}>{title}</h1>
-        <p style={{ color: '#888', fontSize: 13, marginBottom: 28, lineHeight: 1.6 }}>{t('country.subtitle')}</p>
+        <p style={{ color: '#888', fontSize: 13, marginBottom: insight ? 12 : 28, lineHeight: 1.6 }}>{t('country.subtitle')}</p>
+        {insight && (
+          <p style={{ color: '#AAAAAA', fontSize: 14, marginBottom: 28, lineHeight: 1.8, maxWidth: 780 }}>{insight}</p>
+        )}
 
         {error && <p style={{ color: '#A78BFA', fontSize: 14, marginBottom: 20 }}>{error}</p>}
 
