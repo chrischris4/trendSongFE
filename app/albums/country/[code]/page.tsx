@@ -1,7 +1,7 @@
 export const runtime = 'edge';
 
-import ClientOnly from '../../../../components/ClientOnly';
 import CountryPage from '../../../../components/CountryPage';
+import { getTrendingItems } from '../../../../services/serverApi';
 import { findCountry } from '../../../../constants/config';
 
 interface Props { params: Promise<{ code: string }> }
@@ -20,5 +20,7 @@ export async function generateMetadata({ params }: Props) {
 
 export default async function AlbumCountryPage({ params }: Props) {
   const { code } = await params;
-  return <ClientOnly><CountryPage code={code} type="albums" /></ClientOnly>;
+  const resolved = findCountry(code)?.code ?? 'US';
+  const initialItems = await getTrendingItems('albums', resolved, 100);
+  return <CountryPage code={code} type="albums" initialItems={initialItems} initialKey={`albums:${resolved}`} />;
 }

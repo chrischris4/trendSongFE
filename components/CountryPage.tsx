@@ -7,14 +7,20 @@ import Footer from './Footer';
 import TrackCard from './TrackCard';
 import { COUNTRIES, findCountry, countryLabel } from '../constants/config';
 import { useTrending } from '../hooks/useTrending';
-import type { MusicType } from '../types';
+import type { MusicType, TrendingItem } from '../types';
 
-interface Props { code: string; type: MusicType }
+interface Props {
+  code: string;
+  type: MusicType;
+  /** Classement rendu par le serveur, pour que le HTML ne soit pas vide au crawl. */
+  initialItems?: TrendingItem[];
+  initialKey?: string;
+}
 
-export default function CountryPage({ code, type }: Props) {
+export default function CountryPage({ code, type, initialItems, initialKey }: Props) {
   const { t, i18n } = useTranslation();
   const country = findCountry(code);
-  const { items, loading, error } = useTrending(type, country?.code ?? 'US', 100);
+  const { items, loading, error } = useTrending(type, country?.code ?? 'US', 100, initialItems, initialKey);
 
   const label = country ? `${country.flag} ${countryLabel(country, i18n.language)}` : code.toUpperCase();
   const title = type === 'songs'

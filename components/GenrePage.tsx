@@ -7,13 +7,19 @@ import Footer from './Footer';
 import TrackCard from './TrackCard';
 import { MUSIC_GENRES, DEFAULT_COUNTRY, genreLabel as genreName } from '../constants/config';
 import { useTrending } from '../hooks/useTrending';
-import type { MusicType } from '../types';
+import type { MusicType, TrendingItem } from '../types';
 
-interface Props { genre: string; type: MusicType }
+interface Props {
+  genre: string;
+  type: MusicType;
+  /** Classement rendu par le serveur, pour que le HTML ne soit pas vide au crawl. */
+  initialItems?: TrendingItem[];
+  initialKey?: string;
+}
 
-export default function GenrePage({ genre, type }: Props) {
+export default function GenrePage({ genre, type, initialItems, initialKey }: Props) {
   const { t, i18n } = useTranslation();
-  const { items: all, loading, error } = useTrending(type, DEFAULT_COUNTRY, 100);
+  const { items: all, loading, error } = useTrending(type, DEFAULT_COUNTRY, 100, initialItems, initialKey);
 
   const genreDef = MUSIC_GENRES.find(g => g.slug === genre);
 

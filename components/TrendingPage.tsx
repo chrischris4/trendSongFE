@@ -12,17 +12,23 @@ import { useBlog } from '../hooks/useBlog';
 import { useAppStore } from '../store';
 import { artwork, DEFAULT_COUNTRY, findCountry, countryLabel } from '../constants/config';
 import { articleExcerpt, articleTitle, heroItem } from '../utils/blog';
-import type { MusicType } from '../types';
+import type { BlogArticle, MusicType, TrendingItem } from '../types';
 
-interface Props { type: MusicType }
+interface Props {
+  type: MusicType;
+  /** Contenu rendu par le serveur, pour que le HTML ne soit pas vide au crawl. */
+  initialItems?: TrendingItem[];
+  initialKey?: string;
+  initialArticles?: BlogArticle[];
+}
 
-function TrendingContent({ type }: Props) {
+function TrendingContent({ type, initialItems, initialKey, initialArticles }: Props) {
   const { t, i18n } = useTranslation();
   const searchParams = useSearchParams();
   const country = findCountry(searchParams.get('country'))?.code ?? DEFAULT_COUNTRY;
 
-  const { items, loading, error } = useTrending(type, country, 100);
-  const { articles } = useBlog();
+  const { items, loading, error } = useTrending(type, country, 100, initialItems, initialKey);
+  const { articles } = useBlog(initialArticles);
   const lang = useAppStore(s => s.lang);
   const isFr = lang === 'fr';
 
@@ -114,10 +120,10 @@ function TrendingContent({ type }: Props) {
   );
 }
 
-export default function TrendingPage({ type }: Props) {
+export default function TrendingPage({ type, initialItems, initialKey, initialArticles }: Props) {
   return (
     <Suspense fallback={<div style={{ backgroundColor: '#0F0F0F', minHeight: '100vh' }} />}>
-      <TrendingContent type={type} />
+      <TrendingContent type={type} initialItems={initialItems} initialKey={initialKey} initialArticles={initialArticles} />
     </Suspense>
   );
 }

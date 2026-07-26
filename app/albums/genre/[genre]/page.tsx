@@ -1,8 +1,8 @@
 export const runtime = 'edge';
 
-import ClientOnly from '../../../../components/ClientOnly';
 import GenrePage from '../../../../components/GenrePage';
-import { MUSIC_GENRES } from '../../../../constants/config';
+import { getTrendingItems } from '../../../../services/serverApi';
+import { DEFAULT_COUNTRY, MUSIC_GENRES } from '../../../../constants/config';
 
 interface Props { params: Promise<{ genre: string }> }
 
@@ -20,5 +20,6 @@ export async function generateMetadata({ params }: Props) {
 
 export default async function AlbumGenrePage({ params }: Props) {
   const { genre } = await params;
-  return <ClientOnly><GenrePage genre={genre} type="albums" /></ClientOnly>;
+  const initialItems = await getTrendingItems('albums', DEFAULT_COUNTRY, 100);
+  return <GenrePage genre={genre} type="albums" initialItems={initialItems} initialKey={`albums:${DEFAULT_COUNTRY}`} />;
 }
