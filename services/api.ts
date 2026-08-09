@@ -1,4 +1,4 @@
-import type { TrendingItem, BlogArticle, StatsData, MusicType } from '../types';
+import type { TrendingItem, BlogArticle, StatsData, MusicType, TrackHistory } from '../types';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'https://trendsongbe-production.up.railway.app';
 const TTL = 5 * 60 * 1000;
@@ -16,6 +16,10 @@ async function apiFetch<T>(path: string): Promise<T> {
 
 export async function fetchTrending(type: MusicType | 'all' = 'all', country = 'US', limit = 100): Promise<TrendingItem[]> {
   return apiFetch(`/trending?type=${type}&country=${country}&limit=${limit}`);
+}
+
+export async function fetchTrackHistory(appleId: string): Promise<TrackHistory> {
+  return apiFetch(`/trending/history/${appleId}`);
 }
 
 export async function fetchStats(): Promise<StatsData> {

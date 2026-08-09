@@ -1,6 +1,6 @@
 import { cache } from 'react';
-import { fetchBlogArticles, fetchTrending } from './api';
-import type { BlogArticle, MusicType, TrendingItem } from '../types';
+import { fetchBlogArticles, fetchTrending, fetchTrackHistory } from './api';
+import type { BlogArticle, MusicType, TrackHistory, TrendingItem } from '../types';
 
 // Rendu serveur : le contenu doit être dans le HTML envoyé au crawler, pas
 // chargé après coup côté client. `cache()` déduplique l'appel entre
@@ -15,6 +15,15 @@ export const getBlogArticles = cache(async (): Promise<BlogArticle[]> => {
   } catch {
     // API indisponible : la page se rabat sur le chargement client.
     return [];
+  }
+});
+
+export const getTrackHistory = cache(async (appleId: string): Promise<TrackHistory | null> => {
+  try {
+    return await fetchTrackHistory(appleId);
+  } catch {
+    // Titre inconnu ou API indisponible : la fiche reste servie sans trajectoire.
+    return null;
   }
 });
 

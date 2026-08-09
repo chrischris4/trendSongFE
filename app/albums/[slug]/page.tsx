@@ -2,6 +2,8 @@ export const runtime = 'edge';
 
 import ClientOnly from '../../../components/ClientOnly';
 import DetailPage from '../../../components/DetailPage';
+import TrackTrajectory, { isIndexable } from '../../../components/TrackTrajectory';
+import { getTrackHistory } from '../../../services/serverApi';
 import { parseIdFromSlug } from '../../../utils/slug';
 
 interface Props { params: Promise<{ slug: string }> }
@@ -16,17 +18,33 @@ function nameFromSlug(slug: string): string {
 
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
-  const name = nameFromSlug(slug);
+  const history = await getTrackHistory(parseIdFromSlug(slug));
+  // Le nom reconstruit depuis le slug est approximatif : on prefere celui de l'API.
+  const name = history?.name ?? nameFromSlug(slug);
+  const artist = history?.artistName;
+
   return {
-    title: `${name} - Album en tendance, titres et classements`,
-    description: `Tracklist, extraits audio et classements par pays de l'album « ${name} », actuellement dans les charts Apple Music.`,
-    // Fiches album : métadonnées Apple non enrichies, exclues de l'index pour
-    // concentrer le crawl sur les classements et le contenu éditorial.
-    robots: { index: false, follow: true },
+    title: artist ? `${name} — ${artist} : parcours dans les classements` : `${name} - Album en tendance, titres et classements`,
+    description: history
+      ? `${name} de ${artist} : ${history.daysOnChart} jours de présence, ${history.countryCount} pays, meilleure place ${history.peak.rank}e. Trajectoire relevée jour par jour sur les classements Apple Music.`
+      : `Tracklist, extraits audio et classements par pays de l'album « ${name} », actuellement dans les charts Apple Music.`,
+    // Une fiche n'entre dans l'index que si sa trajectoire est assez fournie pour
+    // apporter quelque chose : sinon elle n'est qu'un gabarit de plus.
+    robots: { index: isIndexable(history), follow: true },
+    alternates: { canonical: `https://trend-songs.com/albums/${slug}` },
   };
 }
 
 export default async function AlbumDetailPage({ params }: Props) {
   const { slug } = await params;
-  return <ClientOnly><DetailPage type="albums" id={parseIdFromSlug(slug)} /></ClientOnly>;
+  const appleId = parseIdFromSlug(slug);
+  const history = await getTrackHistory(appleId);
+
+  return (
+    <>
+      <ClientOnly><DetailPage type="albums" id={appleId} /></ClientOnly>
+      {/* Hors ClientOnly : c'est la partie que le crawler doit voir. */}
+      {history && <TrackTrajectory history={history} />}
+    </>
+  );
 }

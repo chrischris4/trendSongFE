@@ -21,6 +21,29 @@ export interface TrendingItem {
   daysOnChart?: number | null;
 }
 
+/**
+ * Trajectoire d'un titre reconstituee a partir de nos releves successifs.
+ * Apple n'expose qu'un classement instantane : ni pic, ni duree, ni parcours.
+ */
+export interface TrackHistory {
+  appleId: string;
+  type: MusicType;
+  name: string;
+  artistName: string;
+  artworkUrl: string | null;
+  url: string | null;
+  releaseDate: string | null;
+  genreNames: string[];
+  explicit: boolean;
+  firstSeen: string;
+  lastSeen: string;
+  daysOnChart: number;
+  countryCount: number;
+  peak: { rank: number; countryCode: string; day: string };
+  countries: { countryCode: string; days: number; bestRank: number; currentRank: number | null }[];
+  timeline: { day: string; bestRank: number; countryCount: number }[];
+}
+
 export type BlogArticleFormat =
   | 'SIMPLE'
   | 'SUGGESTION'
