@@ -8,8 +8,16 @@ import type { TrackHistory } from '../types';
  */
 interface Props { history: TrackHistory }
 
-/** En dessous, la trajectoire est trop courte pour justifier une page indexee. */
-export const MIN_DAYS_TO_INDEX = 5;
+/**
+ * En dessous, la trajectoire est trop courte pour justifier une page indexee.
+ *
+ * La retention a 90 jours n'ayant jamais ete deployee avant le 10/08/2026,
+ * l'historique repart d'environ une semaine et se reconstitue au fil des
+ * synchronisations. Le seuil de 14 jours fait donc office de minuterie : les
+ * fiches s'ouvrent d'elles-memes quand l'archive devient assez profonde, et
+ * rien ne part au crawl tant qu'elle ne l'est pas.
+ */
+export const MIN_DAYS_TO_INDEX = 14;
 export const MIN_COUNTRIES_TO_INDEX = 3;
 
 export function isIndexable(history: TrackHistory | null): boolean {
