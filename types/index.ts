@@ -17,6 +17,8 @@ export interface TrendingItem {
   rank: number;
   countryCode: string;
   fetchedAt: string;
+  /** Jours distincts passes dans ce classement, precalcule par le backend. */
+  daysOnChart?: number | null;
 }
 
 export type BlogArticleFormat =

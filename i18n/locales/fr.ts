@@ -60,6 +60,8 @@ const fr = {
     song: 'Titre',
     album: 'Album',
     release: 'Sortie',
+    days_on_chart_one: '{{count}} jour au classement',
+    days_on_chart_other: '{{count}} jours au classement',
   },
   genre: {
     songs_title: 'Titres — {{genre}}',

@@ -66,6 +66,12 @@ export default function TrackCard({ item }: Props) {
         <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginTop: 6 }}>
           {mainGenre && <span style={{ color: '#8B5CF6', fontSize: 11, fontWeight: 600 }}>{mainGenre}</span>}
           {item.releaseDate && <span style={{ color: '#555', fontSize: 11 }}>{item.releaseDate.substring(0, 4)}</span>}
+          {/* Anciennete au classement : Apple affiche un rang, jamais une duree. */}
+          {typeof item.daysOnChart === 'number' && item.daysOnChart > 0 && (
+            <span style={{ color: '#777', fontSize: 11 }}>
+              {t('card.days_on_chart', { count: item.daysOnChart })}
+            </span>
+          )}
         </div>
       </div>
     </div>
