@@ -1,8 +1,8 @@
 import type { MetadataRoute } from 'next';
-import { MUSIC_GENRES, COUNTRIES } from '../constants/config';
+import { MUSIC_GENRES, COUNTRIES, DEFAULT_COUNTRY } from '../constants/config';
 import { slugify } from '../utils/slug';
 import { articleTitle, articleWordCount } from '../utils/blog';
-import { getBlogArticles } from '../services/serverApi';
+import { getBlogArticles, getTrendingItems } from '../services/serverApi';
 import { countryInsights, genreInsights } from '../constants/insights';
 
 export const runtime = 'edge';
@@ -23,15 +23,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: route === '' ? 1 : 0.8,
   })) as MetadataRoute.Sitemap;
 
-  // On ne soumet au crawl que les pages disposant d'un texte éditorial propre.
-  // Même filtre que le `robots.index` des routes correspondantes.
+  // On ne soumet au crawl que les pages disposant d'un texte éditorial propre
+  // ET remontant au moins un titre du jour : sans le second filtre, le sitemap
+  // listait des pages vides de 90 mots. Même critère que le `robots.index` des
+  // routes correspondantes, sinon sitemap et balise robots se contredisent.
+  const [songItems, albumItems] = await Promise.all([
+    getTrendingItems('songs', DEFAULT_COUNTRY, 100),
+    getTrendingItems('albums', DEFAULT_COUNTRY, 100),
+  ]);
+  const itemsByBase = { songs: songItems, albums: albumItems };
+
   const genreRoutes = (['songs', 'albums'] as const).flatMap(base =>
-    MUSIC_GENRES.filter(g => Boolean(genreInsights[g.slug])).map(g => ({
-      url: url(`/${base}/genre/${g.slug}`),
-      lastModified: new Date(),
-      changeFrequency: 'weekly' as const,
-      priority: 0.6,
-    })),
+    MUSIC_GENRES
+      .filter(g => Boolean(genreInsights[g.slug]))
+      .filter(g => itemsByBase[base].some(item => item.genreIds.includes(g.id)))
+      .map(g => ({
+        url: url(`/${base}/genre/${g.slug}`),
+        lastModified: new Date(),
+        changeFrequency: 'weekly' as const,
+        priority: 0.6,
+      })),
   );
 
   const countryRoutes = (['songs', 'albums'] as const).flatMap(base =>

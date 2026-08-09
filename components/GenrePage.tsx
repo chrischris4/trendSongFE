@@ -36,12 +36,56 @@ export default function GenrePage({ genre, type, initialItems, initialKey }: Pro
     : t('genre.albums_title', { genre: label });
   const analysis = useMemo(() => {
     if (!items.length) return null;
-    const artists = new Set(items.map(item => item.artistName)).size;
-    const leader = items[0];
     const isFr = i18n.language === 'fr';
-    return isFr
-      ? `${leader.name} de ${leader.artistName} mène actuellement cette sélection ${label}. Le classement compte ${items.length} ${type === 'songs' ? 'morceaux' : 'albums'} signés par ${artists} artistes différents. Cet écart entre le nombre d’entrées et le nombre d’artistes permet de repérer les sorties qui occupent plusieurs places à la fois, au lieu de confondre volume de catalogue et diversité réelle.`
-      : `${leader.name} by ${leader.artistName} currently leads this ${label} selection. The ranking contains ${items.length} ${type === 'songs' ? 'tracks' : 'albums'} from ${artists} different artists. Comparing entries with unique artists helps reveal releases occupying several positions at once instead of mistaking catalogue volume for genuine diversity.`;
+    const unit = type === 'songs' ? (isFr ? 'morceaux' : 'tracks') : (isFr ? 'albums' : 'albums');
+    const leader = items[0];
+    const artists = new Set(items.map(item => item.artistName)).size;
+
+    // Part des sorties de l'année en cours : distingue un genre porté par
+    // l'actualité d'un genre porté par son catalogue.
+    const year = new Date().getFullYear();
+    const dated = items.filter(item => item.releaseDate);
+    const fresh = dated.filter(item => item.releaseDate!.startsWith(String(year))).length;
+    const freshPct = dated.length ? Math.round((fresh / dated.length) * 100) : null;
+
+    // Entrée la plus ancienne encore classée.
+    const oldest = dated.length
+      ? dated.reduce((a, b) => (a.releaseDate! < b.releaseDate! ? a : b))
+      : null;
+    const oldestYear = oldest?.releaseDate?.slice(0, 4) ?? null;
+
+    // Artiste le plus représenté, quand il place plus d'une entrée.
+    const perArtist = items.reduce<Record<string, number>>((acc, item) => {
+      acc[item.artistName] = (acc[item.artistName] ?? 0) + 1;
+      return acc;
+    }, {});
+    const [topArtist, topCount] = Object.entries(perArtist).sort((a, b) => b[1] - a[1])[0];
+
+    const parts: string[] = [];
+
+    parts.push(isFr
+      ? `${leader.name} de ${leader.artistName} mène actuellement cette sélection ${label}. Le classement compte ${items.length} ${unit} signés par ${artists} artistes différents. Cet écart entre le nombre d’entrées et le nombre d’artistes permet de repérer les sorties qui occupent plusieurs places à la fois, au lieu de confondre volume de catalogue et diversité réelle.`
+      : `${leader.name} by ${leader.artistName} currently leads this ${label} selection. The ranking contains ${items.length} ${unit} from ${artists} different artists. Comparing entries with unique artists helps reveal releases occupying several positions at once instead of mistaking catalogue volume for genuine diversity.`);
+
+    if (topCount > 1) {
+      parts.push(isFr
+        ? `${topArtist} est l’artiste le plus représenté de cette page avec ${topCount} entrées. Une même signature qui revient plusieurs fois dans un genre indique presque toujours une sortie récente écoutée en intégralité, et non plusieurs succès indépendants.`
+        : `${topArtist} is the most represented artist on this page with ${topCount} entries. One name recurring several times within a genre almost always signals a recent release being played end to end, rather than several independent hits.`);
+    }
+
+    if (freshPct !== null) {
+      parts.push(isFr
+        ? `${freshPct} % de cette sélection est sortie en ${year}, ce qui situe le genre entre deux régimes : au-dessus de la moitié il vit de son actualité, en dessous il vit de son catalogue.`
+        : `${freshPct} % of this selection was released in ${year}, which places the genre between two regimes: above half it lives on new releases, below it lives on its catalogue.`);
+    }
+
+    if (oldestYear && Number(oldestYear) < year) {
+      parts.push(isFr
+        ? `La plus ancienne entrée encore classée ici remonte à ${oldestYear} : ${oldest!.name} de ${oldest!.artistName}. La durée de vie d’un titre dans un classement quotidien est le meilleur indicateur de sa solidité, bien davantage que sa position de départ.`
+        : `The oldest entry still charting here dates from ${oldestYear}: ${oldest!.name} by ${oldest!.artistName}. How long a title survives in a daily chart is a far better measure of its strength than the position it opened at.`);
+    }
+
+    return parts.join(' ');
   }, [items, type, label, i18n.language]);
 
   return (
