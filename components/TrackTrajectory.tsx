@@ -26,6 +26,8 @@ export function isIndexable(history: TrackHistory | null): boolean {
 }
 
 const countryName = (code: string) => findCountry(code)?.name ?? code;
+// « la 1re place », mais « la 2e place » : le rang 1 s'accorde au feminin.
+const ordinal = (rank: number) => (rank === 1 ? '1re' : `${rank}e`);
 const frenchDate = (day: string) => new Date(day + 'T00:00:00Z').toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
 
 export default function TrackTrajectory({ history }: Props) {
@@ -50,7 +52,7 @@ export default function TrackTrajectory({ history }: Props) {
         Depuis le {frenchDate(history.firstSeen)}, ce {unit} a figuré{' '}
         <strong style={{ color: '#fff' }}>{history.daysOnChart} jour{history.daysOnChart > 1 ? 's' : ''}</strong> dans nos
         relevés, sur <strong style={{ color: '#fff' }}>{history.countryCount} pays</strong>. Sa meilleure position est la{' '}
-        <strong style={{ color: '#fff' }}>{history.peak.rank}<sup>e</sup></strong> place, atteinte en{' '}
+        <strong style={{ color: '#fff' }}>{ordinal(history.peak.rank)}</strong> place, atteinte en{' '}
         {countryName(history.peak.countryCode)} le {frenchDate(history.peak.day)}. Apple Music publie le classement du
         moment : ni le pic atteint, ni la durée de présence, ni les pays traversés. Ces trois chiffres viennent de la
         comparaison de nos relevés successifs.
@@ -80,10 +82,10 @@ export default function TrackTrajectory({ history }: Props) {
             {history.countries.slice(0, 15).map(c => (
               <tr key={c.countryCode} style={{ borderTop: '1px solid #2A2A2A', color: '#CCCCCC' }}>
                 <td style={{ padding: '8px 10px 8px 0' }}>{countryName(c.countryCode)}</td>
-                <td style={{ padding: '8px 10px' }}>{c.bestRank}<sup>e</sup></td>
+                <td style={{ padding: '8px 10px' }}>{ordinal(c.bestRank)}</td>
                 <td style={{ padding: '8px 10px' }}>{c.days}</td>
                 <td style={{ padding: '8px 0 8px 10px', color: c.currentRank ? '#A78BFA' : '#666' }}>
-                  {c.currentRank ? `${c.currentRank}e` : 'sorti'}
+                  {c.currentRank ? ordinal(c.currentRank) : 'sorti'}
                 </td>
               </tr>
             ))}
