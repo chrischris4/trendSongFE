@@ -11,7 +11,7 @@ interface Props { params: Promise<{ genre: string }> }
 export async function generateMetadata({ params }: Props) {
   const { genre } = await params;
   const g = MUSIC_GENRES.find(x => x.slug === genre);
-  if (!g) return { title: 'Page introuvable', robots: { index: false, follow: false } };
+  if (!g) return { title: 'Page not found', robots: { index: false, follow: false } };
 
   // Le classement filtre le top 100 de DEFAULT_COUNTRY : un genre absent de ce
   // top rend une page vide, qui ne doit pas partir au crawl.
@@ -19,8 +19,9 @@ export async function generateMetadata({ params }: Props) {
   const hasResults = items.some(item => item.genreIds.includes(g.id));
 
   return {
-    title: `Albums ${g.label} en tendance — Classement du moment`,
-    description: `Les albums ${g.label} les plus écoutés en ce moment sur Apple Music. Mis à jour chaque jour.`,
+    // Libelle anglais : la page est servie et indexee en anglais.
+    title: `Trending ${g.labelEn} albums — Today's chart`,
+    description: `The most played ${g.labelEn} albums on Apple Music right now. Updated every day.`,
     robots: { index: hasResults && Boolean(genreInsights[genre]), follow: true },
     alternates: { canonical: `https://trend-songs.com/albums/genre/${genre}` },
   };

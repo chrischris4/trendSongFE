@@ -6,8 +6,8 @@ export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
 
 export const metadata = {
-  title: 'Albums en tendance',
-  description: 'Les albums les plus écoutés en ce moment sur Apple Music, pays par pays.',
+  title: 'Trending albums',
+  description: 'The most played albums on Apple Music right now, country by country.',
 };
 
 export default async function AlbumsPage() {

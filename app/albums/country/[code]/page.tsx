@@ -11,10 +11,11 @@ interface Props { params: Promise<{ code: string }> }
 export async function generateMetadata({ params }: Props) {
   const { code } = await params;
   const c = findCountry(code);
-  if (!c) return { title: 'Page introuvable', robots: { index: false, follow: false } };
+  if (!c) return { title: 'Page not found', robots: { index: false, follow: false } };
   return {
-    title: `Top albums ${c.name} ${c.flag} — Classement Apple Music du jour`,
-    description: `Les albums les plus écoutés en ce moment · ${c.name}. Top 100 Apple Music mis à jour chaque jour.`,
+    // Libelle anglais : la page est servie et indexee en anglais.
+    title: `Top albums in ${c.nameEn} ${c.flag} — Today's Apple Music chart`,
+    description: `The most played albums right now in ${c.nameEn}. Apple Music Top 100 updated every day.`,
     // Sans texte editorial propre, la page reste accessible mais hors index :
     // on ne soumet pas au crawl des pages purement templatees.
     robots: { index: Boolean(countryInsights[c.code]), follow: true },

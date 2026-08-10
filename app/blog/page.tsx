@@ -6,8 +6,8 @@ export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
 
 export const metadata = {
-  title: 'Blog — Analyses tendances musique',
-  description: 'Analyses et décryptages des tendances musicales mondiales.',
+  title: 'Blog — Music trend analysis',
+  description: 'Analysis and breakdowns of global music trends.',
 };
 
 export default async function Blog() {
