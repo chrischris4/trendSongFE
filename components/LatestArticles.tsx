@@ -7,9 +7,9 @@ import { useAppStore } from '../store';
 import { artwork } from '../constants/config';
 import { articleExcerpt, articleTitle, heroItem } from '../utils/blog';
 import { slugify } from '../utils/slug';
-import type { BlogArticle } from '../types';
+import type { BlogArticleSummary } from '../types';
 
-export default function LatestArticles({ limit = 3, initialArticles }: { limit?: number; initialArticles?: BlogArticle[] }) {
+export default function LatestArticles({ limit = 3, initialArticles }: { limit?: number; initialArticles?: BlogArticleSummary[] }) {
   const { i18n } = useTranslation();
   const { lang } = useAppStore();
   const isFr = lang === 'fr' || i18n.language === 'fr';
@@ -31,12 +31,10 @@ export default function LatestArticles({ limit = 3, initialArticles }: { limit?:
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 14 }}>
         {latest.map(a => {
-          const primary = heroItem(a);
-          const artworkPath = primary?.artworkUrl ?? a.artworkUrl;
-          const cover = artworkPath ? artwork(artworkPath, 200) : null;
-          const title = articleTitle(a, isFr);
-          const excerpt = articleExcerpt(a, isFr);
-          const artistName = primary?.artistName ?? a.artistName;
+          const cover = a.artworkUrl ? artwork(a.artworkUrl, 200) : null;
+          const title = articleTitle(a);
+          const excerpt = articleExcerpt(a);
+          const artistName = a.artistName;
           return (
             <Link
               key={a.id}

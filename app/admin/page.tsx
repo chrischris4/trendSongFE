@@ -2,34 +2,30 @@
 
 import { useEffect, useState } from 'react';
 import { createBlogArticle, updateBlogArticle, deleteBlogArticle, fetchAllBlogArticles } from '../../services/admin';
-import type { BlogArticle, BlogArticleFormat } from '../../types';
+import type { BlogArticle, BlogArticleSummary, BlogArticleFormat } from '../../types';
 
 interface FormData {
   format: BlogArticleFormat;
   appleId: string;
   type: string;
   title: string;
-  titleFr: string;
   titleEn: string;
   artistName: string;
   artworkUrl: string;
   streamCount: string;
   countryCount: string;
   weekOf: string;
-  editorialFr: string;
   editorialEn: string;
-  introFr: string;
   introEn: string;
-  conclusionFr: string;
   conclusionEn: string;
   itemsJson: string;
   published: boolean;
 }
 
 const emptyForm: FormData = {
-  format: 'SIMPLE', appleId: '', type: 'songs', title: '', titleFr: '', titleEn: '', artistName: '',
-  artworkUrl: '', streamCount: '', countryCount: '', weekOf: '', editorialFr: '', editorialEn: '',
-  introFr: '', introEn: '', conclusionFr: '', conclusionEn: '', itemsJson: '',
+  format: 'SIMPLE', appleId: '', type: 'songs', title: '', titleEn: '', artistName: '',
+  artworkUrl: '', streamCount: '', countryCount: '', weekOf: '', editorialEn: '',
+  introEn: '', conclusionEn: '', itemsJson: '',
   published: false,
 };
 
@@ -54,18 +50,14 @@ export default function AdminPage() {
       appleId: a.appleId ?? '',
       type: a.type ?? 'songs',
       title: a.title,
-      titleFr: a.titleFr ?? a.title,
       titleEn: a.titleEn ?? a.title,
       artistName: a.artistName,
       artworkUrl: a.artworkUrl ?? '',
       streamCount: a.streamCount?.toString() ?? '',
       countryCount: a.countryCount?.toString() ?? '',
       weekOf: a.weekOf ? a.weekOf.split('T')[0] : '',
-      editorialFr: a.editorialFr,
       editorialEn: a.editorialEn,
-      introFr: a.introFr ?? '',
       introEn: a.introEn ?? '',
-      conclusionFr: a.conclusionFr ?? '',
       conclusionEn: a.conclusionEn ?? '',
       itemsJson: a.items?.length
         ? JSON.stringify(a.items.map(({ id, articleId, ...item }) => item), null, 2)
@@ -94,18 +86,14 @@ export default function AdminPage() {
         ...(form.appleId ? { appleId: form.appleId } : {}),
         type: form.type || undefined,
         title: form.title,
-        titleFr: form.titleFr || form.title,
         titleEn: form.titleEn || form.title,
         artistName: form.artistName,
         ...(form.artworkUrl ? { artworkUrl: form.artworkUrl } : {}),
         ...(form.streamCount ? { streamCount: Number(form.streamCount) } : {}),
         ...(form.countryCount ? { countryCount: Number(form.countryCount) } : {}),
         weekOf: form.weekOf || new Date().toISOString().split('T')[0],
-        editorialFr: form.editorialFr,
         editorialEn: form.editorialEn,
-        ...(form.introFr ? { introFr: form.introFr } : {}),
         ...(form.introEn ? { introEn: form.introEn } : {}),
-        ...(form.conclusionFr ? { conclusionFr: form.conclusionFr } : {}),
         ...(form.conclusionEn ? { conclusionEn: form.conclusionEn } : {}),
         ...(items ? { items } : {}),
         published: form.published,
@@ -184,10 +172,6 @@ export default function AdminPage() {
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
               <div>
-                <label style={{ fontSize: 12, color: '#888', display: 'block', marginBottom: 4 }}>Titre éditorial FR</label>
-                <input style={inp} value={form.titleFr} onChange={e => setForm(f => ({ ...f, titleFr: e.target.value }))} />
-              </div>
-              <div>
                 <label style={{ fontSize: 12, color: '#888', display: 'block', marginBottom: 4 }}>Editorial title EN</label>
                 <input style={inp} value={form.titleEn} onChange={e => setForm(f => ({ ...f, titleEn: e.target.value }))} />
               </div>
@@ -217,28 +201,16 @@ export default function AdminPage() {
               </div>
             </div>
             <div>
-              <label style={{ fontSize: 12, color: '#888', display: 'block', marginBottom: 4 }}>Éditorial FR *</label>
-              <textarea required rows={5} style={{ ...inp, resize: 'vertical' }} value={form.editorialFr} onChange={e => setForm(f => ({ ...f, editorialFr: e.target.value }))} />
-            </div>
-            <div>
               <label style={{ fontSize: 12, color: '#888', display: 'block', marginBottom: 4 }}>Editorial EN *</label>
               <textarea required rows={5} style={{ ...inp, resize: 'vertical' }} value={form.editorialEn} onChange={e => setForm(f => ({ ...f, editorialEn: e.target.value }))} />
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-              <div>
-                <label style={{ fontSize: 12, color: '#888', display: 'block', marginBottom: 4 }}>Introduction FR</label>
-                <textarea rows={4} style={{ ...inp, resize: 'vertical' }} value={form.introFr} onChange={e => setForm(f => ({ ...f, introFr: e.target.value }))} />
-              </div>
               <div>
                 <label style={{ fontSize: 12, color: '#888', display: 'block', marginBottom: 4 }}>Introduction EN</label>
                 <textarea rows={4} style={{ ...inp, resize: 'vertical' }} value={form.introEn} onChange={e => setForm(f => ({ ...f, introEn: e.target.value }))} />
               </div>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-              <div>
-                <label style={{ fontSize: 12, color: '#888', display: 'block', marginBottom: 4 }}>Conclusion FR</label>
-                <textarea rows={4} style={{ ...inp, resize: 'vertical' }} value={form.conclusionFr} onChange={e => setForm(f => ({ ...f, conclusionFr: e.target.value }))} />
-              </div>
               <div>
                 <label style={{ fontSize: 12, color: '#888', display: 'block', marginBottom: 4 }}>Conclusion EN</label>
                 <textarea rows={4} style={{ ...inp, resize: 'vertical' }} value={form.conclusionEn} onChange={e => setForm(f => ({ ...f, conclusionEn: e.target.value }))} />
@@ -298,7 +270,7 @@ export default function AdminPage() {
                   }}>
                     {a.published ? 'En ligne' : 'Brouillon'}
                   </span>
-                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>#{a.id} — {a.titleFr ?? a.title}</span>
+                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>#{a.id} — {a.titleEn ?? a.title}</span>
                 </div>
                 <div style={{ fontSize: 12, color: '#666' }}>
                   {new Date(a.createdAt).toLocaleDateString('fr-FR')} · {a.format ?? 'SIMPLE'} · {a.type ?? '—'}

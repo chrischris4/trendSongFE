@@ -10,7 +10,7 @@ import { useAppStore } from '../store';
 import { artwork } from '../constants/config';
 import { articleExcerpt, articleTitle, formatLabel, heroItem } from '../utils/blog';
 import { slugify } from '../utils/slug';
-import type { BlogArticle } from '../types';
+import type { BlogArticle, BlogArticleSummary } from '../types';
 
 function formatStreams(n: number): string {
   if (n >= 1_000_000_000) return `${(n / 1_000_000_000).toFixed(1)}B`;
@@ -19,15 +19,11 @@ function formatStreams(n: number): string {
   return `${n}`;
 }
 
-function ArticleCard({ article, isFr, t }: { article: BlogArticle; isFr: boolean; t: (k: string) => string }) {
-  const title = articleTitle(article, isFr);
-  const primary = heroItem(article);
-  const artworkPath = primary?.artworkUrl ?? article.artworkUrl;
-  const artworkUrl = artworkPath ? artwork(artworkPath, 300) : null;
-  const artistName = primary?.artistName ?? article.artistName;
-  const streamCount = primary?.streamCount ?? article.streamCount;
-  const countryCount = primary?.countryCount ?? article.countryCount;
-  const articleType = primary?.type ?? article.type;
+function ArticleCard({ article, isFr, t }: { article: BlogArticleSummary; isFr: boolean; t: (k: string) => string }) {
+  const title = articleTitle(article);
+  // La liste porte deja les champs de l element principal, a plat.
+  const artworkUrl = article.artworkUrl ? artwork(article.artworkUrl, 300) : null;
+  const { artistName, streamCount, countryCount, type: articleType } = article;
 
   return (
     <div style={{ backgroundColor: '#141414', border: '1px solid #2A2A2A', borderRadius: 12, overflow: 'hidden', marginBottom: 32 }}>
@@ -92,7 +88,7 @@ function ArticleCard({ article, isFr, t }: { article: BlogArticle; isFr: boolean
 
       <div style={{ padding: '18px 24px 24px' }}>
         <p style={{ color: '#AAAAAA', fontSize: 14, lineHeight: 1.7, margin: 0, display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-          {articleExcerpt(article, isFr)}
+          {articleExcerpt(article)}
         </p>
         <Link href={`/blog/${slugify(title, String(article.id))}`} style={{ display: 'inline-block', marginTop: 12, color: '#A78BFA', fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>
           {t('blog.read_more')} →
@@ -166,7 +162,7 @@ function FilterBar({
   );
 }
 
-export default function BlogPage({ initialArticles }: { initialArticles?: BlogArticle[] }) {
+export default function BlogPage({ initialArticles }: { initialArticles?: BlogArticleSummary[] }) {
   const { t } = useTranslation();
   const { lang } = useAppStore();
   const isFr = lang === 'fr';

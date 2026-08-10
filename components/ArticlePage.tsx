@@ -4,11 +4,12 @@ import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 import Header from './Header';
 import Footer from './Footer';
-import { useBlog } from '../hooks/useBlog';
+import { useEffect, useState } from 'react';
+import { fetchBlogArticle, fetchBlogArticles } from '../services/api';
 import { useAppStore } from '../store';
 import { artwork } from '../constants/config';
 import { slugify } from '../utils/slug';
-import type { BlogArticle } from '../types';
+import type { BlogArticle, BlogArticleSummary } from '../types';
 import {
   articleConclusion,
   articleIntro,
@@ -26,14 +27,26 @@ function formatStreams(n: number): string {
   return `${n}`;
 }
 
-export default function ArticlePage({ id, initialArticles }: { id: number; initialArticles?: BlogArticle[] }) {
+export default function ArticlePage({ id, initialArticle, initialOthers = [] }: { id: number; initialArticle?: BlogArticle | null; initialOthers?: BlogArticleSummary[] }) {
   const { t } = useTranslation();
   const { lang } = useAppStore();
   const isFr = lang === 'fr';
-  const { articles, loading, error } = useBlog(initialArticles);
+  // Le texte integral vient de /blog/:id, la liste n'en transporte plus.
+  const [article, setArticle] = useState<BlogArticle | null>(initialArticle ?? null);
+  const [others, setOthers] = useState<BlogArticleSummary[]>(initialOthers);
+  const [loading, setLoading] = useState(!initialArticle);
+  const [error, setError] = useState<string | null>(null);
 
-  const article = articles.find(a => a.id === id);
-  const others = articles.filter(a => a.id !== id).slice(0, 3);
+  useEffect(() => {
+    if (initialArticle) return;
+    Promise.all([fetchBlogArticle(id), fetchBlogArticles()])
+      .then(([full, list]) => {
+        setArticle(full);
+        setOthers(list.filter(a => a.id !== id).slice(0, 3));
+      })
+      .catch(() => setError('not found'))
+      .finally(() => setLoading(false));
+  }, [id, initialArticle]);
 
   if (loading) return (
     <div style={{ backgroundColor: '#0F0F0F', minHeight: '100vh' }}>
@@ -56,7 +69,7 @@ export default function ArticlePage({ id, initialArticles }: { id: number; initi
     </div>
   );
 
-  const title = articleTitle(article, isFr);
+  const title = articleTitle(article);
   const primary = heroItem(article);
   const artworkPath = primary?.artworkUrl ?? article.artworkUrl;
   const artworkUrl = artworkPath ? artwork(artworkPath, 400) : null;
@@ -64,10 +77,10 @@ export default function ArticlePage({ id, initialArticles }: { id: number; initi
   const streamCount = primary?.streamCount ?? article.streamCount;
   const countryCount = primary?.countryCount ?? article.countryCount;
   const articleType = primary?.type ?? article.type;
-  const intro = articleIntro(article, isFr);
-  const conclusion = articleConclusion(article, isFr);
+  const intro = articleIntro(article);
+  const conclusion = articleConclusion(article);
   const hasStructuredSections = article.items?.some(item =>
-    Boolean(item.sectionTextFr || item.sectionTextEn || item.sectionTitleFr || item.sectionTitleEn),
+    Boolean(item.sectionTextEn || item.sectionTitleEn),
   ) || article.items?.length > 1;
   const articleUrl = `https://trend-songs.com/blog/${slugify(title, String(article.id))}`;
   const publishedAt = new Date(article.createdAt).toISOString();
@@ -138,8 +151,8 @@ export default function ArticlePage({ id, initialArticles }: { id: number; initi
             <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
               {article.items.map(item => {
                 const itemArtwork = item.artworkUrl ? artwork(item.artworkUrl, 400) : null;
-                const sectionTitle = itemSectionTitle(item, isFr);
-                const sectionText = itemSectionText(item, isFr);
+                const sectionTitle = itemSectionTitle(item);
+                const sectionText = itemSectionText(item);
                 return (
                   <section key={item.id ?? `${article.id}-${item.position}`} style={{ display: 'flex', gap: 18, alignItems: 'flex-start', padding: 18, backgroundColor: '#141414', border: '1px solid #2A2A2A', borderRadius: 12, flexWrap: 'wrap' }}>
                     {itemArtwork && <img src={itemArtwork} alt={item.title} loading="lazy" style={{ width: 130, height: 130, objectFit: 'cover', borderRadius: 9, flexShrink: 0 }} />}
@@ -158,7 +171,7 @@ export default function ArticlePage({ id, initialArticles }: { id: number; initi
           </div>
         ) : (
           <p style={{ color: '#CCCCCC', fontSize: 15, lineHeight: 1.9, marginBottom: 40, whiteSpace: 'pre-line' }}>
-            {isFr ? article.editorialFr : article.editorialEn}
+            {article.editorialEn}
           </p>
         )}
 
@@ -167,9 +180,8 @@ export default function ArticlePage({ id, initialArticles }: { id: number; initi
             <h2 style={{ color: '#fff', fontSize: 15, fontWeight: 700, marginBottom: 14 }}>{isFr ? 'Autres analyses' : 'More analyses'}</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {others.map(a => {
-                const otherTitle = articleTitle(a, isFr);
-                const otherHero = heroItem(a);
-                const otherArtwork = otherHero?.artworkUrl ?? a.artworkUrl;
+                const otherTitle = articleTitle(a);
+                const otherArtwork = a.artworkUrl;
                 return (
                   <Link key={a.id} href={`/blog/${slugify(otherTitle, String(a.id))}`}
                     style={{ display: 'flex', alignItems: 'center', gap: 12, backgroundColor: '#141414', border: '1px solid #2A2A2A', borderRadius: 10, padding: '10px 14px', textDecoration: 'none', transition: 'border-color 150ms' }}
@@ -179,7 +191,7 @@ export default function ArticlePage({ id, initialArticles }: { id: number; initi
                     {otherArtwork && <img src={artwork(otherArtwork, 200) ?? undefined} alt={otherTitle} style={{ width: 44, height: 44, objectFit: 'cover', borderRadius: 6, flexShrink: 0 }} />}
                     <span style={{ flex: 1, minWidth: 0 }}>
                       <span style={{ display: 'block', color: '#fff', fontSize: 13, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{otherTitle}</span>
-                      <span style={{ display: 'block', color: '#888', fontSize: 12 }}>{otherHero?.artistName ?? a.artistName}</span>
+                      <span style={{ display: 'block', color: '#888', fontSize: 12 }}>{a.artistName}</span>
                     </span>
                   </Link>
                 );

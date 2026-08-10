@@ -12,14 +12,14 @@ import { useBlog } from '../hooks/useBlog';
 import { useAppStore } from '../store';
 import { artwork, DEFAULT_COUNTRY, findCountry, countryLabel } from '../constants/config';
 import { articleExcerpt, articleTitle, heroItem } from '../utils/blog';
-import type { BlogArticle, MusicType, TrendingItem } from '../types';
+import type { BlogArticle, BlogArticleSummary, MusicType, TrendingItem } from '../types';
 
 interface Props {
   type: MusicType;
   /** Contenu rendu par le serveur, pour que le HTML ne soit pas vide au crawl. */
   initialItems?: TrendingItem[];
   initialKey?: string;
-  initialArticles?: BlogArticle[];
+  initialArticles?: BlogArticleSummary[];
 }
 
 function TrendingContent({ type, initialItems, initialKey, initialArticles }: Props) {
@@ -37,9 +37,8 @@ function TrendingContent({ type, initialItems, initialKey, initialArticles }: Pr
     if (filtered.length === 0) return null;
     return filtered[Math.floor(Math.random() * filtered.length)];
   }, [articles, type]);
-  const featuredHero = featuredArticle ? heroItem(featuredArticle) : null;
-  const featuredArtwork = featuredHero?.artworkUrl ?? featuredArticle?.artworkUrl;
-  const featuredTitle = featuredArticle ? articleTitle(featuredArticle, isFr) : '';
+  const featuredArtwork = featuredArticle?.artworkUrl;
+  const featuredTitle = featuredArticle ? articleTitle(featuredArticle) : '';
 
   const title      = type === 'songs' ? t('songs.title')       : t('albums.title');
   const subtitle   = type === 'songs' ? t('songs.subtitle')    : t('albums.subtitle');
@@ -85,7 +84,7 @@ function TrendingContent({ type, initialItems, initialKey, initialArticles }: Pr
                   {featuredTitle}
                 </p>
                 <p style={{ color: '#888', fontSize: 12, margin: 0, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', lineHeight: 1.5 }}>
-                  {articleExcerpt(featuredArticle, isFr)}
+                  {articleExcerpt(featuredArticle)}
                 </p>
               </div>
             </div>

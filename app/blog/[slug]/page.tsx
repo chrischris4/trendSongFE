@@ -3,7 +3,7 @@ export const runtime = 'edge';
 import type { Metadata } from 'next';
 import ArticlePage from '../../../components/ArticlePage';
 import { parseIdFromSlug, slugify } from '../../../utils/slug';
-import { getBlogArticles } from '../../../services/serverApi';
+import { getBlogArticle, getBlogArticles } from '../../../services/serverApi';
 import { articleExcerpt, articleTitle, articleWordCount } from '../../../utils/blog';
 
 interface Props { params: Promise<{ slug: string }> }
@@ -11,16 +11,17 @@ interface Props { params: Promise<{ slug: string }> }
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const id = Number(parseIdFromSlug(slug));
-  const article = (await getBlogArticles()).find(a => a.id === id);
-  const title = article ? articleTitle(article, false) : 'Music chart analysis';
+  const article = await getBlogArticle(id);
+  const summary = (await getBlogArticles()).find(a => a.id === id);
+  const title = article ? articleTitle(article) : 'Music chart analysis';
   const description = article
-    ? articleExcerpt(article, false).slice(0, 155)
+    ? summary!.excerpt.slice(0, 155)
     : 'Original analysis based on country-level Apple Music charts.';
 
   return {
     title,
     description,
-    robots: { index: article ? articleWordCount(article) >= 350 : false, follow: true },
+    robots: { index: (summary?.wordCount ?? 0) >= 350, follow: true },
     // Le slug varie avec la langue du titre : on canonicalise toujours sur la version EN.
     alternates: {
       canonical: article
@@ -38,6 +39,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function BlogArticleRoute({ params }: Props) {
   const { slug } = await params;
-  const articles = await getBlogArticles();
-  return <ArticlePage id={Number(parseIdFromSlug(slug))} initialArticles={articles} />;
+  const id = Number(parseIdFromSlug(slug));
+  const [article, list] = await Promise.all([getBlogArticle(id), getBlogArticles()]);
+  return <ArticlePage id={id} initialArticle={article} initialOthers={list.filter(a => a.id !== id).slice(0, 3)} />;
 }

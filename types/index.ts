@@ -65,30 +65,46 @@ export interface BlogArticleItem {
   artworkUrl: string | null;
   streamCount: number | null;
   countryCount: number | null;
-  sectionTitleFr: string | null;
   sectionTitleEn: string | null;
-  sectionTextFr: string | null;
   sectionTextEn: string | null;
 }
 
+/** Projection servie par GET /blog : de quoi rendre une carte, sans le texte. */
+export interface BlogArticleSummary {
+  id: number;
+  format: BlogArticleFormat;
+  title: string;
+  titleEn: string | null;
+  appleId: string | null;
+  type: string | null;
+  artistName: string;
+  artworkUrl: string | null;
+  streamCount: number | null;
+  countryCount: number | null;
+  weekOf: string;
+  createdAt: string;
+  published: boolean;
+  excerpt: string;
+  /** Calcule par le backend, pour que la liste n ait pas besoin du texte. */
+  wordCount: number;
+  itemCount: number;
+}
+
+/** Article complet, servi par GET /blog/:id uniquement. */
 export interface BlogArticle {
   id: number;
   format: BlogArticleFormat;
   appleId: string | null;
   type: string | null;
   title: string;
-  titleFr: string | null;
   titleEn: string | null;
   artistName: string;
   artworkUrl: string | null;
   streamCount: number | null;
   countryCount: number | null;
   weekOf: string;
-  editorialFr: string;
   editorialEn: string;
-  introFr: string | null;
   introEn: string | null;
-  conclusionFr: string | null;
   conclusionEn: string | null;
   items: BlogArticleItem[];
   published: boolean;

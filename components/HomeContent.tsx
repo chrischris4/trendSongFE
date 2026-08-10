@@ -18,13 +18,13 @@ import { useAppStore } from '../store';
 import { MUSIC_GENRES, DEFAULT_COUNTRY, artwork, findCountry } from '../constants/config';
 import { articleExcerpt, articleTitle, formatLabel, heroItem } from '../utils/blog';
 import { slugify } from '../utils/slug';
-import type { BlogArticle, MusicType, TrendingItem } from '../types';
+import type { BlogArticle, BlogArticleSummary, MusicType, TrendingItem } from '../types';
 
 interface Props {
   initialItems: TrendingItem[];
   /** Couple type/pays rendu par le serveur, au format "songs:US". */
   initialKey: string;
-  initialArticles: BlogArticle[];
+  initialArticles: BlogArticleSummary[];
 }
 
 export default function HomeContent({ initialItems, initialKey, initialArticles }: Props) {
@@ -47,7 +47,7 @@ export default function HomeContent({ initialItems, initialKey, initialArticles 
     return [
       filtered.find(article => (article.format ?? 'SIMPLE') === 'SIMPLE'),
       filtered.find(article => (article.format ?? 'SIMPLE') !== 'SIMPLE'),
-    ].filter((article): article is BlogArticle => article !== undefined);
+    ].filter((article): article is BlogArticleSummary => article !== undefined);
   }, [articles, mediaType]);
 
   const filtered = useMemo(() => {
@@ -84,10 +84,10 @@ export default function HomeContent({ initialItems, initialKey, initialArticles 
           <div style={{ display: 'grid', gap: 8, marginBottom: 24 }}>
             {featuredArticles.map(article => {
               const structured = (article.format ?? 'SIMPLE') !== 'SIMPLE';
-              const title = articleTitle(article, isFr);
-              const hero = heroItem(article);
-              const featuredArtwork = hero?.artworkUrl ?? article.artworkUrl;
-              const itemCount = article.items?.length ?? 0;
+              const title = articleTitle(article);
+              // La liste porte deja la pochette et le nombre d'elements.
+              const featuredArtwork = article.artworkUrl;
+              const itemCount = article.itemCount;
 
               return (
                 <a
@@ -133,7 +133,7 @@ export default function HomeContent({ initialItems, initialKey, initialArticles 
                         {title}
                       </p>
                       <p style={{ color: '#888', fontSize: 12, margin: 0, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', lineHeight: 1.5 }}>
-                        {articleExcerpt(article, isFr)}
+                        {articleExcerpt(article)}
                       </p>
                     </div>
                   </div>
