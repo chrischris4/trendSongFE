@@ -211,6 +211,24 @@ const en = {
     accept: 'Accept',
     decline: 'Decline',
   },
+  trajectory: {
+    title: 'Chart trajectory',
+    intro_songs: 'Since {{firstSeen}}, this track has appeared on {{days}} of our daily snapshots, across {{countries}} countries. Its best position is {{rank}}, reached in {{country}} on {{peakDate}}.',
+    intro_albums: 'Since {{firstSeen}}, this album has appeared on {{days}} of our daily snapshots, across {{countries}} countries. Its best position is {{rank}}, reached in {{country}} on {{peakDate}}.',
+    source_note: 'Apple Music publishes the ranking of the moment: neither the peak reached, nor how long a release holds on, nor the countries it travelled through. These three figures come from comparing our own successive snapshots.',
+    still_charting: 'At the latest snapshot on {{date}}, it is still charting in {{count}} countries',
+    also_left: ', and it has dropped out of {{count}} more',
+    gone_all: 'It no longer appears in any chart as of the {{date}} snapshot.',
+    strongest_day: ' Its widest day remains {{date}}, with a simultaneous presence in {{count}} countries.',
+    best_country: ' The country where it settled best is {{country}}, with {{days}} days of presence.',
+    table_title: 'Country by country',
+    th_country: 'Country',
+    th_best: 'Best position',
+    th_days: 'Days',
+    th_current: 'Currently',
+    out: 'out',
+    more_countries: 'and {{count}} more countries.',
+  },
 };
 
 export default en;

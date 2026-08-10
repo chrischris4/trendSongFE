@@ -2,7 +2,8 @@ export const runtime = 'edge';
 
 import ClientOnly from '../../../components/ClientOnly';
 import DetailPage from '../../../components/DetailPage';
-import TrackTrajectory, { isIndexable } from '../../../components/TrackTrajectory';
+import TrackTrajectory from '../../../components/TrackTrajectory';
+import { isIndexable } from '../../../utils/trajectory';
 import { getTrackHistory } from '../../../services/serverApi';
 import { parseIdFromSlug } from '../../../utils/slug';
 
@@ -24,10 +25,11 @@ export async function generateMetadata({ params }: Props) {
   const artist = history?.artistName;
 
   return {
-    title: artist ? `${name} — ${artist} : parcours dans les classements` : `${name} - Album en tendance, titres et classements`,
+    // Metadonnees en anglais, comme `<html lang="en">` et le corps de la page.
+    title: artist ? `${name} — ${artist}: chart trajectory` : `${name} - Trending album, tracks and rankings`,
     description: history
-      ? `${name} de ${artist} : ${history.daysOnChart} jours de présence, ${history.countryCount} pays, meilleure place ${history.peak.rank}e. Trajectoire relevée jour par jour sur les classements Apple Music.`
-      : `Tracklist, extraits audio et classements par pays de l'album « ${name} », actuellement dans les charts Apple Music.`,
+      ? `${name} by ${artist}: ${history.daysOnChart} days on the charts, ${history.countryCount} countries, best position #${history.peak.rank}. Trajectory recorded day by day from the Apple Music charts.`
+      : `Tracklist, audio previews and country rankings for the album "${name}", currently in the Apple Music charts.`,
     // Une fiche n'entre dans l'index que si sa trajectoire est assez fournie pour
     // apporter quelque chose : sinon elle n'est qu'un gabarit de plus.
     robots: { index: isIndexable(history), follow: true },
