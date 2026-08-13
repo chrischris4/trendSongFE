@@ -173,7 +173,7 @@ export default function WeeklyPage() {
         {stats && stats.topSongs?.length > 0 && stats.topAlbums?.length > 0 && (
           <div style={sec}>
             <h2 style={h2}>📊 {isFr ? 'Top 5 mondial de la semaine' : 'Global top 5 of the week'}</h2>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))', gap: 20 }}>
               {[
                 { title: isFr ? 'Titres' : 'Songs', items: stats.topSongs.slice(0, 5), base: 'songs' },
                 { title: isFr ? 'Albums' : 'Albums', items: stats.topAlbums.slice(0, 5), base: 'albums' },

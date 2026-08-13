@@ -156,7 +156,7 @@ export default function DetailPage({ type, id }: Props) {
                   onMouseLeave={e => (e.currentTarget as HTMLElement).style.borderColor = '#2A2A2A'}
                 >
                   <span style={{ fontSize: 18 }}>{pos.flag}</span>
-                  <span style={{ color: '#ddd', fontSize: 12, fontWeight: 600, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{pos.name}</span>
+                  <span style={{ color: '#ddd', fontSize: 12, fontWeight: 600, flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{pos.name}</span>
                   <span style={{ color: '#A78BFA', fontWeight: 800, fontSize: 13 }}>#{pos.rank}</span>
                 </Link>
               ))}

@@ -56,19 +56,20 @@ export default function TrackCard({ item }: Props) {
         </div>
       </div>
 
-      <div style={{ padding: '10px 12px 12px' }}>
-        <div style={{ fontWeight: 700, fontSize: 13, lineHeight: 1.3, color: '#fff', marginBottom: 3, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical' }} title={item.name}>
+      {/* minWidth 0 partout : sans ca le texte impose sa largeur mini a la colonne de grille et deborde en mobile. */}
+      <div style={{ padding: '10px 12px 12px', minWidth: 0 }}>
+        <div style={{ fontWeight: 700, fontSize: 13, lineHeight: 1.3, color: '#fff', marginBottom: 3, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', overflowWrap: 'anywhere' }} title={item.name}>
           {item.name}
         </div>
-        <div style={{ color: '#AAAAAA', fontSize: 12, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical' }}>
+        <div style={{ color: '#AAAAAA', fontSize: 12, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', overflowWrap: 'anywhere' }}>
           {item.artistName}
         </div>
-        <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginTop: 6 }}>
-          {mainGenre && <span style={{ color: '#8B5CF6', fontSize: 11, fontWeight: 600 }}>{mainGenre}</span>}
+        <div style={{ display: 'flex', flexWrap: 'wrap', columnGap: 6, rowGap: 2, alignItems: 'center', marginTop: 6, minWidth: 0 }}>
+          {mainGenre && <span style={{ color: '#8B5CF6', fontSize: 11, fontWeight: 600, minWidth: 0, maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{mainGenre}</span>}
           {item.releaseDate && <span style={{ color: '#555', fontSize: 11 }}>{item.releaseDate.substring(0, 4)}</span>}
           {/* Anciennete au classement : Apple affiche un rang, jamais une duree. */}
           {typeof item.daysOnChart === 'number' && item.daysOnChart > 0 && (
-            <span style={{ color: '#777', fontSize: 11 }}>
+            <span style={{ color: '#777', fontSize: 11, minWidth: 0, maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {t('card.days_on_chart', { count: item.daysOnChart })}
             </span>
           )}

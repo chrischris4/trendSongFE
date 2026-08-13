@@ -80,7 +80,7 @@ export default function StatsPage() {
             </div>
 
             {/* Global top songs & albums */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24, marginBottom: 40 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))', gap: 24, marginBottom: 40 }}>
               {[
                 { title: `🎵 ${t('stats.top_songs')}`, items: stats.topSongs, base: 'songs' },
                 { title: `💿 ${t('stats.top_albums')}`,  items: stats.topAlbums,  base: 'albums' },
