@@ -3,11 +3,14 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MUSIC_GENRES, findCountry, countryLabel as countryName, genreLabel } from '../constants/config';
+import type { MusicGenre } from '../constants/config';
 import type { TrendingItem, MusicType } from '../types';
 
 interface Props {
   items: TrendingItem[];
   type: MusicType;
+  /** Genre selectionne, pour que le titre decrive la liste affichee. */
+  genre?: MusicGenre | null;
 }
 
 const INSIGHTS: Record<MusicType, { fr: string; en: string }> = {
@@ -21,7 +24,7 @@ const INSIGHTS: Record<MusicType, { fr: string; en: string }> = {
   },
 };
 
-export default function InsightBar({ items, type }: Props) {
+export default function InsightBar({ items, type, genre = null }: Props) {
   const { i18n } = useTranslation();
   const isFr = i18n.language === 'fr';
 
@@ -71,8 +74,25 @@ export default function InsightBar({ items, type }: Props) {
     : <>{hi(`"${stats.top.name}"`)} by {hi(stats.top.artistName)} leads the {num(countryLabel)} chart.{' '}
         {stats.topArtist && stats.topArtist[1] > 1 && <>Most present artist: {num(stats.topArtist[0])} ({stats.topArtist[1]} entries in the top {items.length}).</>}</>;
 
+  // Rappel de ce que contient la liste : volume, support, pays, genre filtre.
+  const titleSegments = [
+    isFr
+      ? `Top ${items.length} ${type === 'songs' ? 'titres' : 'albums'}`
+      : `Top ${items.length} ${type === 'songs' ? 'songs' : 'albums'}`,
+    countryLabel,
+    genre ? genreLabel(genre, isFr ? 'fr' : 'en') : null,
+  ].filter((segment): segment is string => Boolean(segment));
+
   return (
     <div style={{ maxWidth: 1280, margin: '0 auto', padding: '14px 16px 12px' }}>
+      <h2 style={{ color: '#fff', fontSize: 17, fontWeight: 700, margin: '0 0 8px', lineHeight: 1.4 }}>
+        {titleSegments.map((segment, i) => (
+          <span key={segment}>
+            {i > 0 && <span style={{ color: '#555', fontWeight: 400, margin: '0 8px' }}>·</span>}
+            {segment}
+          </span>
+        ))}
+      </h2>
       <p style={{ color: '#888', fontSize: 13, marginBottom: 8, lineHeight: 1.6, fontStyle: 'italic' }}>
         {editorial}
       </p>
@@ -90,7 +110,6 @@ export default function InsightBar({ items, type }: Props) {
           ))}
         </div>
       )}
-      <div style={{ height: 1, background: 'linear-gradient(90deg, #7C3AED, #EC4899)' }} />
     </div>
   );
 }

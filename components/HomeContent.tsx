@@ -133,12 +133,14 @@ export default function HomeContent({ initialItems, initialKey, initialArticles 
               </a>
             );
           })}
+          {/* Separe les articles du classement qui suit. */}
+          <div style={{ height: 1, background: 'linear-gradient(90deg, #7C3AED, #EC4899)', marginTop: 12 }} />
         </div>
       )}
 
       {!loading && !error && items.length > 0 && (
         <div className="insight-bar">
-          <InsightBar items={items} type={mediaType} />
+          <InsightBar items={items} type={mediaType} genre={genreDef} />
         </div>
       )}
 
