@@ -16,7 +16,8 @@ const en = {
     contact: 'Contact',
   },
   home: {
-    discover_title: 'Discover the most played songs and albums in the world right now',
+    // Les crochets marquent la portion teintee en degrade dans l'accroche.
+    discover_title: 'Discover the most played [songs and albums] in the world right now',
     hero_title: 'Global music charts',
     hero_subtitle: 'Songs & albums on repeat right now',
     trending_songs: 'Trending songs',

@@ -16,7 +16,8 @@ const fr = {
     contact: 'Contact',
   },
   home: {
-    discover_title: 'Découvrez les titres et albums les plus écoutés dans le monde en ce moment',
+    // Les crochets marquent la portion teintee en degrade dans l'accroche.
+    discover_title: 'Découvrez les [titres et albums] les plus écoutés dans le monde en ce moment',
     hero_title: 'Les charts mondiaux',
     hero_subtitle: 'Titres & albums qui tournent en boucle en ce moment',
     trending_songs: 'Titres tendance',
