@@ -1,6 +1,6 @@
 import { cache } from 'react';
-import { fetchBlogArticles, fetchBlogArticle, fetchTrending, fetchTrackHistory } from './api';
-import type { BlogArticle, BlogArticleSummary, MusicType, TrackHistory, TrendingItem } from '../types';
+import { fetchBlogArticles, fetchBlogArticle, fetchTrending, fetchTrackHistory, fetchWeeklyReports, fetchWeeklyReport } from './api';
+import type { BlogArticle, BlogArticleSummary, MusicType, TrackHistory, TrendingItem, WeeklyReport } from '../types';
 
 // Rendu serveur : le contenu doit être dans le HTML envoyé au crawler, pas
 // chargé après coup côté client. `cache()` déduplique l'appel entre
@@ -44,3 +44,20 @@ export const getTrendingItems = cache(
     }
   },
 );
+
+export const getWeeklyReports = cache(async (): Promise<WeeklyReport[]> => {
+  try {
+    return await fetchWeeklyReports();
+  } catch {
+    // Le bilan est un complement : son absence ne doit jamais vider la page.
+    return [];
+  }
+});
+
+export const getWeeklyReport = cache(async (slug: string): Promise<WeeklyReport | null> => {
+  try {
+    return await fetchWeeklyReport(slug);
+  } catch {
+    return null;
+  }
+});

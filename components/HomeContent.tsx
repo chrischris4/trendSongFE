@@ -12,13 +12,14 @@ import CountryFilter from './CountryFilter';
 import InsightBar from './InsightBar';
 import EditorialSection from './EditorialSection';
 import LatestArticles from './LatestArticles';
+import WeeklyTeaser from './WeeklyTeaser';
 import { useTrending } from '../hooks/useTrending';
 import { useBlog } from '../hooks/useBlog';
 import { useAppStore } from '../store';
 import { MUSIC_GENRES, DEFAULT_COUNTRY, artwork, findCountry } from '../constants/config';
 import { articleExcerpt, articleTitle, formatLabel, heroItem } from '../utils/blog';
 import { slugify } from '../utils/slug';
-import type { BlogArticle, BlogArticleSummary, MusicType, TrendingItem } from '../types';
+import type { BlogArticle, BlogArticleSummary, MusicType, TrendingItem, WeeklyReport } from '../types';
 
 /** L'accroche marque entre crochets la portion a teinter en degrade. */
 function highlightTitle(text: string) {
@@ -34,9 +35,11 @@ interface Props {
   /** Couple type/pays rendu par le serveur, au format "songs:US". */
   initialKey: string;
   initialArticles: BlogArticleSummary[];
+  /** Bilan de la semaine ecoulee, null tant qu'aucun n'a ete publie. */
+  weekly: WeeklyReport | null;
 }
 
-export default function HomeContent({ initialItems, initialKey, initialArticles }: Props) {
+export default function HomeContent({ initialItems, initialKey, initialArticles, weekly }: Props) {
   const { t } = useTranslation();
   const searchParams = useSearchParams();
 
@@ -172,6 +175,8 @@ export default function HomeContent({ initialItems, initialKey, initialArticles 
           </div>
         )}
       </div>
+
+      <WeeklyTeaser report={weekly} />
 
       <LatestArticles initialArticles={initialArticles} />
 

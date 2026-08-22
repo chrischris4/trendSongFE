@@ -2,7 +2,7 @@ import type { MetadataRoute } from 'next';
 import { MUSIC_GENRES, COUNTRIES, DEFAULT_COUNTRY } from '../constants/config';
 import { slugify } from '../utils/slug';
 import { articleTitle, articleWordCount } from '../utils/blog';
-import { getBlogArticles, getTrendingItems } from '../services/serverApi';
+import { getBlogArticles, getTrendingItems, getWeeklyReports } from '../services/serverApi';
 import { countryInsights, genreInsights } from '../constants/insights';
 
 export const runtime = 'edge';
@@ -66,5 +66,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7,
     }));
 
-  return [...staticRoutes, ...genreRoutes, ...countryRoutes, ...blogRoutes];
+  // Un bilan par semaine, fige a sa publication : lastModified porte la fin de
+  // la semaine couverte et ne bouge plus ensuite. C'est exactement le signal
+  // qu'attend un crawler face a une archive, contrairement aux pages de
+  // classement dont la date change tous les jours.
+  const weeklyRoutes: MetadataRoute.Sitemap = (await getWeeklyReports()).map(r => ({
+    url: url(`/weekly/${r.slug}`),
+    lastModified: new Date(r.weekEnd),
+    changeFrequency: 'yearly' as const,
+    priority: 0.7,
+  }));
+
+  return [...staticRoutes, ...genreRoutes, ...countryRoutes, ...blogRoutes, ...weeklyRoutes];
 }

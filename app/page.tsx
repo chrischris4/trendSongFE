@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import HomeContent from '../components/HomeContent';
-import { getBlogArticles, getTrendingItems } from '../services/serverApi';
+import { getBlogArticles, getTrendingItems, getWeeklyReports } from '../services/serverApi';
 import { DEFAULT_COUNTRY, findCountry } from '../constants/config';
 
 export const runtime = 'edge';
@@ -17,9 +17,10 @@ export default async function HomePage({ searchParams }: Props) {
   const mediaType = params.type === 'albums' ? 'albums' : 'songs';
   const country = findCountry(params.country)?.code ?? DEFAULT_COUNTRY;
 
-  const [initialItems, initialArticles] = await Promise.all([
+  const [initialItems, initialArticles, weeklyReports] = await Promise.all([
     getTrendingItems(mediaType, country, 100),
     getBlogArticles(),
+    getWeeklyReports(),
   ]);
 
   return (
@@ -28,6 +29,7 @@ export default async function HomePage({ searchParams }: Props) {
         initialItems={initialItems}
         initialKey={`${mediaType}:${country}`}
         initialArticles={initialArticles}
+        weekly={weeklyReports[0] ?? null}
       />
     </Suspense>
   );

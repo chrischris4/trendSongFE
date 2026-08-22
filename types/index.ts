@@ -145,3 +145,41 @@ export interface StatsData {
   newToday: number;
   lastUpdated: string;
 }
+
+export interface WeeklyReportItem {
+  position: number;
+  appleId: string;
+  type: MusicType;
+  name: string;
+  artistName: string;
+  artworkUrl: string | null;
+  countryCount: number;
+  bestRank: number;
+}
+
+export interface WeeklyReport {
+  slug: string;
+  weekStart: string;
+  weekEnd: string;
+  churnAvg: number;
+  churnPrev: number | null;
+  newEntries: number;
+  droppedOut: number;
+  uniqueArtists: number;
+  mostStableCountry: string | null;
+  mostStableChurn: number | null;
+  mostVolatileCountry: string | null;
+  mostVolatileChurn: number | null;
+  topGainerId: string | null;
+  topGainerName: string | null;
+  topGainerArtist: string | null;
+  topGainerDelta: number | null;
+  topGainerCountry: string | null;
+  topTenureId: string | null;
+  topTenureName: string | null;
+  topTenureArtist: string | null;
+  topTenureDays: number | null;
+  headline: string;
+  daysCovered: number;
+  items: WeeklyReportItem[];
+}

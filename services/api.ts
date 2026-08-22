@@ -1,4 +1,4 @@
-import type { TrendingItem, BlogArticle, BlogArticleSummary, StatsData, MusicType, TrackHistory } from '../types';
+import type { TrendingItem, BlogArticle, BlogArticleSummary, StatsData, MusicType, TrackHistory, WeeklyReport } from '../types';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'https://trendsongbe-production.up.railway.app';
 const TTL = 5 * 60 * 1000;
@@ -32,4 +32,12 @@ export async function fetchStats(): Promise<StatsData> {
 
 export async function fetchBlogArticles(): Promise<BlogArticleSummary[]> {
   return apiFetch('/blog');
+}
+
+export async function fetchWeeklyReports(): Promise<WeeklyReport[]> {
+  return apiFetch('/weekly');
+}
+
+export async function fetchWeeklyReport(slug: string): Promise<WeeklyReport> {
+  return apiFetch(`/weekly/${slug}`);
 }
