@@ -136,7 +136,7 @@ export default function WeeklyPage() {
                 return (
                   <div key={g.genreId} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
                     <span style={{ color: '#A78BFA', fontWeight: 800, fontSize: 12, minWidth: 18 }}>#{i + 1}</span>
-                    <Link href={`/songs/genre/${def?.slug ?? ''}`} style={{ color: '#ddd', fontSize: 13, fontWeight: 600, textDecoration: 'none', flex: 1 }}>
+                    <Link prefetch={false} href={`/songs/genre/${def?.slug ?? ''}`} style={{ color: '#ddd', fontSize: 13, fontWeight: 600, textDecoration: 'none', flex: 1 }}>
                       {def ? `${def.emoji} ${genreLabel(def, lang)}` : g.name}
                     </Link>
                     <span style={{ color: '#555', fontSize: 12 }}>{g.pct}%</span>
@@ -181,7 +181,7 @@ export default function WeeklyPage() {
                 <div key={title}>
                   <div style={{ color: '#888', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 10 }}>{title}</div>
                   {items.map((item, i) => (
-                    <Link key={item.appleId} href={`/${base}/${slugify(item.name, item.appleId)}`}
+                    <Link prefetch={false} key={item.appleId} href={`/${base}/${slugify(item.name, item.appleId)}`}
                       style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: '1px solid #1A1A1A', textDecoration: 'none' }}>
                       <span style={{ color: '#A78BFA', fontWeight: 800, fontSize: 13, minWidth: 22 }}>#{i + 1}</span>
                       <span style={{ flex: 1, minWidth: 0 }}>

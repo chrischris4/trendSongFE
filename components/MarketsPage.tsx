@@ -63,7 +63,7 @@ export default function MarketsPage() {
                 <span style={{ color: '#555', fontSize: 12, fontWeight: 600, marginLeft: 'auto', backgroundColor: '#1F1F1F', padding: '2px 8px', borderRadius: 4 }}>{m.code}</span>
               </div>
               <p style={{ color: '#AAAAAA', fontSize: 14, lineHeight: 1.8, margin: '0 0 10px' }}>{m.text}</p>
-              <Link href={`/songs/country/${m.code.toLowerCase()}/`} style={{ fontSize: 13, fontWeight: 600, color: '#FF6482', textDecoration: 'none' }}>
+              <Link prefetch={false} href={`/songs/country/${m.code.toLowerCase()}/`} style={{ fontSize: 13, fontWeight: 600, color: '#FF6482', textDecoration: 'none' }}>
                 {isFr ? `Voir le classement ${m.name}` : `See the ${m.name} chart`} →
               </Link>
             </div>
@@ -81,7 +81,7 @@ export default function MarketsPage() {
             <div key={g.slug} style={{ backgroundColor: '#141414', border: '1px solid #2A2A2A', borderRadius: 12, padding: '16px 20px' }}>
               <h3 style={{ color: '#fff', fontSize: 16, fontWeight: 700, margin: '0 0 8px' }}>{g.label}</h3>
               <p style={{ color: '#AAAAAA', fontSize: 14, lineHeight: 1.8, margin: '0 0 10px' }}>{g.text}</p>
-              <Link href={`/songs/genre/${g.slug}/`} style={{ fontSize: 13, fontWeight: 600, color: '#FF6482', textDecoration: 'none' }}>
+              <Link prefetch={false} href={`/songs/genre/${g.slug}/`} style={{ fontSize: 13, fontWeight: 600, color: '#FF6482', textDecoration: 'none' }}>
                 {isFr ? `Voir le top ${g.label}` : `See the ${g.label} top`} →
               </Link>
             </div>

@@ -84,7 +84,7 @@ export default function CountryPage({ code, type, initialItems, initialKey }: Pr
           <h2 style={{ color: '#fff', fontSize: 15, fontWeight: 700, marginBottom: 14 }}>{t('country.other_countries')}</h2>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             {COUNTRIES.filter(c => c.code !== country?.code).map(c => (
-              <Link key={c.code} href={`/${type}/country/${c.code.toLowerCase()}`} style={chip}>
+              <Link prefetch={false} key={c.code} href={`/${type}/country/${c.code.toLowerCase()}`} style={chip}>
                 {c.flag} {countryLabel(c, i18n.language)}
               </Link>
             ))}

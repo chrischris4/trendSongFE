@@ -37,7 +37,7 @@ export default function CountryFilter({ mediaType, genreSlug, selected }: Props)
       </div>
       <HScrollWithArrows contentContainerStyle={contentStyle}>
         {others.map(c => (
-          <Link key={c.code} href={countryHref(c.code)} style={chip} className="tab-hover">
+          <Link prefetch={false} key={c.code} href={countryHref(c.code)} style={chip} className="tab-hover">
             {c.flag} {countryLabel(c, i18n.language)}
           </Link>
         ))}

@@ -150,7 +150,7 @@ export default function DetailPage({ type, id }: Props) {
             <p style={{ color: '#555', fontSize: 12, marginBottom: 14 }}>{t('detail.chart_positions_sub')}</p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 10 }}>
               {detail.chartPositions.map(pos => (
-                <Link key={pos.countryCode} href={`/${type}/country/${pos.countryCode.toLowerCase()}`}
+                <Link prefetch={false} key={pos.countryCode} href={`/${type}/country/${pos.countryCode.toLowerCase()}`}
                   style={{ display: 'flex', alignItems: 'center', gap: 8, backgroundColor: '#141414', border: '1px solid #2A2A2A', borderRadius: 8, padding: '10px 12px', textDecoration: 'none', transition: 'border-color 150ms' }}
                   onMouseEnter={e => (e.currentTarget as HTMLElement).style.borderColor = '#444'}
                   onMouseLeave={e => (e.currentTarget as HTMLElement).style.borderColor = '#2A2A2A'}
@@ -190,7 +190,7 @@ export default function DetailPage({ type, id }: Props) {
             </h2>
             <HScrollWithArrows contentContainerStyle={{ gap: 12, paddingBottom: 8 }}>
               {detail.moreFromArtist.map((item: MiniItem) => (
-                <Link key={item.appleId} href={`/${item.type}/${slugify(item.name, item.appleId)}`} style={{ flexShrink: 0, width: 140, display: 'block' }}>
+                <Link prefetch={false} key={item.appleId} href={`/${item.type}/${slugify(item.name, item.appleId)}`} style={{ flexShrink: 0, width: 140, display: 'block' }}>
                   <div style={{ backgroundColor: '#141414', border: '1px solid #2A2A2A', borderRadius: 8, overflow: 'hidden', transition: 'border-color 160ms' }}
                     onMouseEnter={e => (e.currentTarget as HTMLDivElement).style.borderColor = '#444'}
                     onMouseLeave={e => (e.currentTarget as HTMLDivElement).style.borderColor = '#2A2A2A'}

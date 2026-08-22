@@ -89,7 +89,7 @@ export default function StatsPage() {
                   <h2 style={{ color: '#fff', fontSize: 15, fontWeight: 700, marginBottom: 14 }}>{title}</h2>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                     {items.map((item, i) => (
-                      <Link key={item.appleId} href={`/${base}/${slugify(item.name, item.appleId)}`} style={cardStyle}
+                      <Link prefetch={false} key={item.appleId} href={`/${base}/${slugify(item.name, item.appleId)}`} style={cardStyle}
                         onMouseEnter={e => (e.currentTarget as HTMLElement).style.borderColor = '#444'}
                         onMouseLeave={e => (e.currentTarget as HTMLElement).style.borderColor = '#2A2A2A'}
                       >
