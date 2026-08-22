@@ -2,7 +2,8 @@ import type { MetadataRoute } from 'next';
 import { MUSIC_GENRES, COUNTRIES, DEFAULT_COUNTRY } from '../constants/config';
 import { slugify } from '../utils/slug';
 import { articleTitle, articleWordCount } from '../utils/blog';
-import { getBlogArticles, getTrendingItems, getWeeklyReports } from '../services/serverApi';
+import { getBlogArticles, getTrendingItems, getWeeklyReports, getIndexableTracks } from '../services/serverApi';
+import { MIN_DAYS_TO_INDEX, MIN_COUNTRIES_TO_INDEX } from '../utils/trajectory';
 import { countryInsights, genreInsights } from '../constants/insights';
 
 export const runtime = 'edge';
@@ -77,5 +78,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
-  return [...staticRoutes, ...genreRoutes, ...countryRoutes, ...blogRoutes, ...weeklyRoutes];
+  // Les fiches n'etaient declarees nulle part : Google devait toutes les
+  // decouvrir en crawlant, sans savoir lesquelles valent son budget. On ne
+  // soumet que celles qui passent le meme seuil que leur balise robots.index,
+  // en reutilisant les constantes du front pour que les deux ne divergent pas.
+  const trackRoutes: MetadataRoute.Sitemap = (
+    await getIndexableTracks(MIN_DAYS_TO_INDEX, MIN_COUNTRIES_TO_INDEX)
+  ).map(t => ({
+    url: url(`/${t.type}/${slugify(t.name, t.appleId)}`),
+    lastModified: new Date(t.lastSeen),
+    changeFrequency: 'daily' as const,
+    priority: 0.6,
+  }));
+
+  return [...staticRoutes, ...genreRoutes, ...countryRoutes, ...blogRoutes, ...weeklyRoutes, ...trackRoutes];
 }

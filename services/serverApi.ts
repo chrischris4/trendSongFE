@@ -1,6 +1,6 @@
 import { cache } from 'react';
-import { fetchBlogArticles, fetchBlogArticle, fetchTrending, fetchTrackHistory, fetchWeeklyReports, fetchWeeklyReport } from './api';
-import type { BlogArticle, BlogArticleSummary, MusicType, TrackHistory, TrendingItem, WeeklyReport } from '../types';
+import { ApiError, fetchBlogArticles, fetchBlogArticle, fetchTrending, fetchTrackHistory, fetchWeeklyReports, fetchWeeklyReport, fetchIndexableTracks } from './api';
+import type { BlogArticle, BlogArticleSummary, MusicType, TrackHistory, TrendingItem, WeeklyReport, IndexableTrack } from '../types';
 
 // Rendu serveur : le contenu doit être dans le HTML envoyé au crawler, pas
 // chargé après coup côté client. `cache()` déduplique l'appel entre
@@ -18,20 +18,25 @@ export const getBlogArticles = cache(async (): Promise<BlogArticleSummary[]> => 
   }
 });
 
+// null signifie « cet article n'existe pas », et rien d'autre : la page en
+// tire un notFound(). Une panne de l'API remonte en 500, que Google reessaie,
+// au lieu d'un 404 qu'il tiendrait pour acquis.
 export const getBlogArticle = cache(async (id: number): Promise<BlogArticle | null> => {
   try {
     return await fetchBlogArticle(id);
-  } catch {
-    return null;
+  } catch (e) {
+    if (e instanceof ApiError && e.status === 404) return null;
+    throw e;
   }
 });
 
+// Meme regle que getBlogArticle : seul un 404 franc referme la fiche.
 export const getTrackHistory = cache(async (appleId: string): Promise<TrackHistory | null> => {
   try {
     return await fetchTrackHistory(appleId);
-  } catch {
-    // Titre inconnu ou API indisponible : la fiche reste servie sans trajectoire.
-    return null;
+  } catch (e) {
+    if (e instanceof ApiError && e.status === 404) return null;
+    throw e;
   }
 });
 
@@ -40,6 +45,18 @@ export const getTrendingItems = cache(
     try {
       return await fetchTrending(type, country, limit);
     } catch {
+      return [];
+    }
+  },
+);
+
+export const getIndexableTracks = cache(
+  async (minDays: number, minCountries: number): Promise<IndexableTrack[]> => {
+    try {
+      return await fetchIndexableTracks(minDays, minCountries);
+    } catch {
+      // Le sitemap doit rester servi meme si l'API tombe : mieux vaut une liste
+      // amputee qu'un sitemap en erreur, que Google retirerait de son suivi.
       return [];
     }
   },

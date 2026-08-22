@@ -146,6 +146,17 @@ export interface StatsData {
   lastUpdated: string;
 }
 
+/** Fiche jugee assez fournie pour etre indexee, filtree cote backend. */
+export interface IndexableTrack {
+  appleId: string;
+  type: MusicType;
+  name: string;
+  artistName: string;
+  daysOnChart: number;
+  countryCount: number;
+  lastSeen: string;
+}
+
 export interface WeeklyReportItem {
   position: number;
   appleId: string;

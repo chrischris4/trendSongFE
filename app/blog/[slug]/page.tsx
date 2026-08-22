@@ -1,6 +1,7 @@
 export const runtime = 'edge';
 
 import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import ArticlePage from '../../../components/ArticlePage';
 import { parseIdFromSlug, slugify } from '../../../utils/slug';
 import { getBlogArticle, getBlogArticles } from '../../../services/serverApi';
@@ -41,5 +42,9 @@ export default async function BlogArticleRoute({ params }: Props) {
   const { slug } = await params;
   const id = Number(parseIdFromSlug(slug));
   const [article, list] = await Promise.all([getBlogArticle(id), getBlogArticles()]);
+  // Un slug fantaisiste renvoyait un gabarit vide en 200 : meme surface infinie
+  // que les fiches, et exactement le motif reproche par AdSense.
+  if (!article) notFound();
+
   return <ArticlePage id={id} initialArticle={article} initialOthers={list.filter(a => a.id !== id).slice(0, 3)} />;
 }

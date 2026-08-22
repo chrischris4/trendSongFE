@@ -1,5 +1,6 @@
 export const runtime = 'edge';
 
+import { notFound } from 'next/navigation';
 import ClientOnly from '../../../components/ClientOnly';
 import DetailPage from '../../../components/DetailPage';
 import TrackTrajectory from '../../../components/TrackTrajectory';
@@ -41,12 +42,16 @@ export default async function AlbumDetailPage({ params }: Props) {
   const { slug } = await params;
   const appleId = parseIdFromSlug(slug);
   const history = await getTrackHistory(appleId);
+  // Sans trajectoire, la fiche n'apporte rien que la source ne dise deja, et
+  // n'importe quel slug inverse renvoyait jusqu'ici un 200. Le 404 referme une
+  // surface d'URL autrement infinie, que les crawlers parcouraient sans fin.
+  if (!history) notFound();
 
   return (
     <>
       <ClientOnly><DetailPage type="albums" id={appleId} /></ClientOnly>
       {/* Hors ClientOnly : c'est la partie que le crawler doit voir. */}
-      {history && <TrackTrajectory history={history} />}
+      <TrackTrajectory history={history} />
     </>
   );
 }
