@@ -50,16 +50,13 @@ export const getTrendingItems = cache(
   },
 );
 
+// Volontairement sans filet : un sitemap ampute est pire qu'un sitemap absent.
+// En renvoyant [] sur incident, on declarerait 570 URLs de moins d'un coup, ce
+// que Google lit comme « ces pages ont disparu ». En laissant remonter l'erreur,
+// le sitemap repond 500, Google reessaie et conserve la version precedente.
 export const getIndexableTracks = cache(
-  async (minDays: number, minCountries: number): Promise<IndexableTrack[]> => {
-    try {
-      return await fetchIndexableTracks(minDays, minCountries);
-    } catch {
-      // Le sitemap doit rester servi meme si l'API tombe : mieux vaut une liste
-      // amputee qu'un sitemap en erreur, que Google retirerait de son suivi.
-      return [];
-    }
-  },
+  async (minDays: number, minCountries: number): Promise<IndexableTrack[]> =>
+    fetchIndexableTracks(minDays, minCountries),
 );
 
 export const getWeeklyReports = cache(async (): Promise<WeeklyReport[]> => {
