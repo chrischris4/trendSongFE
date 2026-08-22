@@ -1,7 +1,17 @@
 // Apple artwork URLs come as 100x100 — swap in the size we need.
+//
+// On bascule aussi l'extension en webp : Apple sert la meme vignette dans les
+// deux formats et l'ecart est enorme — 64 774 o en jpg contre 21 070 o en webp
+// pour une pochette 400x400, sans difference visible. La home en affiche cent.
+// Aucun appelant ne s'en sert pour des metadonnees openGraph, ou le webp
+// generait certains crawlers sociaux.
 export function artwork(url: string | null | undefined, size = 400): string | null {
   if (!url) return null;
-  return url.replace(/\d+x\d+bb/, `${size}x${size}bb`);
+  // Extension optionnelle a dessein : toutes les URLs finissent aujourd'hui en
+  // `100x100bb.jpg`, mais si Apple changeait de suffixe un motif strict ne
+  // remplacerait plus rien et les pochettes resteraient en 100x100 sans que
+  // rien ne le signale.
+  return url.replace(/\d+x\d+bb(\.[a-z]+)?/i, `${size}x${size}bb.webp`);
 }
 
 export const MUSIC_GENRES = [

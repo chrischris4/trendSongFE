@@ -10,7 +10,10 @@ interface Props { item: TrendingItem }
 
 export default function TrackCard({ item }: Props) {
   const { t } = useTranslation();
-  const artworkUrl = artwork(item.artworkUrl, 400);
+  // Les cartes s'affichent entre 174 px (2 colonnes en mobile) et 238 px
+  // (5 colonnes en desktop) : 300 couvre le retina courant sans servir du 400
+  // deux fois trop grand. Combine au webp, 64 774 o tombent a 14 466 o.
+  const artworkUrl = artwork(item.artworkUrl, 300);
   const mainGenre = item.genreNames[0] ?? null;
 
   const href = item.type === 'songs'
